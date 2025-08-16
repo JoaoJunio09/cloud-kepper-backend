@@ -1,10 +1,7 @@
 package br.com.joaojunio.cloudkeeper.data.dto;
 
-import jakarta.persistence.*;
-
 import java.util.Objects;
 
-@Entity(name = "tb_user")
 public class UserDTO {
 
     private Long id;
