@@ -27,14 +27,7 @@ public class User {
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
 
-    public User(Long id, String firstName, String lastName, String email, String password, Boolean enabled) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.enabled = enabled;
-    }
+    public User() {}
 
     public Long getId() {
         return id;
@@ -76,8 +69,8 @@ public class User {
         this.password = password;
     }
 
-    public Integer getEnabled() {
-        return enabled ? 1 : 0;
+    public Boolean getEnabled() {
+        return this.enabled;
     }
 
     public void setEnabled(Boolean enabled) {

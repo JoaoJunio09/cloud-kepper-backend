@@ -8,7 +8,7 @@ spring:
     password: 1234567
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
     show-sql: false

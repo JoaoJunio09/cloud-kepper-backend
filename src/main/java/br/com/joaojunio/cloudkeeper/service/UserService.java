@@ -1,5 +1,7 @@
 package br.com.joaojunio.cloudkeeper.service;
 
+import br.com.joaojunio.cloudkeeper.data.dto.UserDTO;
+import br.com.joaojunio.cloudkeeper.exceptions.NotFoundException;
 import br.com.joaojunio.cloudkeeper.model.User;
 import br.com.joaojunio.cloudkeeper.repositories.UserRepository;
 import org.slf4j.Logger;
@@ -20,32 +22,54 @@ public class UserService {
     @Autowired
     UserRepository repository;
 
-    public List<User> findAll() {
-        return null;
+    public List<UserDTO> findAll() {
+
+        logger.info("Finding all User");
+
+        return parseListObjects(repository.findAll(), UserDTO.class);
     }
 
-    public User findById(Long id) {
+    public UserDTO findById(Long id) {
 
         logger.info("Finding one User");
 
-        return mockDataUser();
+        var entity = repository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Not Found this ID : " + id));
+
+        var dto = parseObject(entity, UserDTO.class);
+        return dto;
     }
 
-    public User create(User user) {
+    public UserDTO create(UserDTO user) {
 
         logger.info("Creating new User");
 
-        return repository.save(user);
+        var entity = parseObject(user, User.class);
+        return parseObject(repository.save(entity), UserDTO.class);
     }
 
-    private User mockDataUser() {
-        return new User(
-            1L,
-            "João Junio",
-            "Trindade Castro",
-            "joaojunio1=818@gmail.com",
-            "1234567",
-            true
-        );
+    public UserDTO update(UserDTO user) {
+
+        logger.info("Updating a User");
+
+        var entity = repository.findById(user.getId())
+            .orElseThrow(() -> new NotFoundException("Not Found this ID : " + user.getId()));
+        entity.setFirstName(user.getFirstName());
+        entity.setLastName(user.getLastName());
+        entity.setEmail(user.getEmail());
+        entity.setPassword(user.getPassword());
+        entity.setEnabled(user.getEnabled());
+
+        var dto = parseObject(repository.save(entity), UserDTO.class);
+        return dto;
+    }
+
+    public void delete(Long id) {
+
+        logger.info("Deleting one User");
+
+        var entity = repository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Not Found this ID : " + id));
+        repository.delete(entity);
     }
 }
