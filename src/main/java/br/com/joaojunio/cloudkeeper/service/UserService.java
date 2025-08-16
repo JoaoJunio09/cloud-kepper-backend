@@ -1,6 +1,6 @@
 package br.com.joaojunio.cloudkeeper.service;
 
-import br.com.joaojunio.cloudkeeper.data.dto.UserDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.user.UserDTO;
 import br.com.joaojunio.cloudkeeper.exceptions.NotFoundException;
 import br.com.joaojunio.cloudkeeper.model.User;
 import br.com.joaojunio.cloudkeeper.repositories.UserRepository;

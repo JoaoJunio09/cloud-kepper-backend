@@ -1,4 +1,4 @@
-package br.com.joaojunio.cloudkeeper.data.dto;
+package br.com.joaojunio.cloudkeeper.data.dto.user;
 
 import java.util.Objects;
 
