@@ -1,6 +1,7 @@
 package br.com.joaojunio.cloudkeeper.exceptions.handler;
 
 import br.com.joaojunio.cloudkeeper.exceptions.ExceptionResponse;
+import br.com.joaojunio.cloudkeeper.exceptions.FileStorageException;
 import br.com.joaojunio.cloudkeeper.exceptions.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,15 @@ public class CustomizedResponseHandler {
             ex.getMessage(),
             request.getDescription(false),
             new Date());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(FileStorageException.class)
+    public ResponseEntity<ExceptionResponse> handleFileStorageException(FileStorageException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                ex.getMessage(),
+                request.getDescription(false),
+                new Date());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 }

@@ -1,5 +1,7 @@
 cors:
   originPatterns: http://localhost:8080,http://localhost:5050
+file:
+  uploadDir: C:/Temp/cloudkeeper
 spring:
   application:
     name: cloudkeeper
@@ -15,3 +17,13 @@ spring:
       hibernate:
     show-sql: false
     open-in-view: false
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
+spring-doc:
+  path-to-match: /api/**/v1/**
+  swagger-ui:
+    use-root-path: true
