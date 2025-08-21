@@ -1,5 +1,6 @@
 package br.com.joaojunio.cloudkeeper.exceptions.handler;
 
+import br.com.joaojunio.cloudkeeper.exceptions.BadRequestException;
 import br.com.joaojunio.cloudkeeper.exceptions.ExceptionResponse;
 import br.com.joaojunio.cloudkeeper.exceptions.FileStorageException;
 import br.com.joaojunio.cloudkeeper.exceptions.NotFoundException;
@@ -41,6 +42,15 @@ public class CustomizedResponseHandler {
                 ex.getMessage(),
                 request.getDescription(false),
                 new Date());
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                ex.getMessage(),
+                request.getDescription(false),
+                new Date());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 }

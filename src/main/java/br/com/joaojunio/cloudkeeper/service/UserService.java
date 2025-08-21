@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.List;
 
 import static br.com.joaojunio.cloudkeeper.mapper.ObjectMapper.parseObject;
@@ -45,8 +47,18 @@ public class UserService {
         logger.info("Creating new User");
 
         var entity = parseObject(user, User.class);
-        return parseObject(repository.save(entity), UserDTO.class);
+        var entitySaved = repository.save(entity);
+
+        if (entitySaved == null) {
+            throw new IllegalArgumentException("User Entity of null");
+        }
+
+
+
+        return parseObject(entitySaved, UserDTO.class);
     }
+
+
 
     public UserDTO update(UserDTO user) {
 

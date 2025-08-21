@@ -2,7 +2,9 @@ package br.com.joaojunio.cloudkeeper.model;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -26,6 +28,9 @@ public class User {
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<File> files = new HashSet<>();
 
     public User() {}
 
@@ -75,6 +80,14 @@ public class User {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Set<File> getFiles() {
+        return files;
+    }
+
+    public void setFiles(Set<File> files) {
+        this.files = files;
     }
 
     @Override
