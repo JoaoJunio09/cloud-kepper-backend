@@ -29,6 +29,9 @@ public class User {
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
 
+    @OneToOne(mappedBy = "user")
+    private FolderStructure folderStructure;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<File> files = new HashSet<>();
 
