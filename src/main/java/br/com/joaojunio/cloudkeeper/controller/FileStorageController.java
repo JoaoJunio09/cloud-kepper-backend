@@ -3,6 +3,7 @@ package br.com.joaojunio.cloudkeeper.controller;
 import br.com.joaojunio.cloudkeeper.controller.docs.FileStorageControllerDocs;
 import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.service.FileStorageService;
+import br.com.joaojunio.cloudkeeper.service.FolderStructureService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -30,10 +31,22 @@ public class FileStorageController implements FileStorageControllerDocs {
     @Autowired
     private FileStorageService service;
 
+    @Autowired
+    private FolderStructureService folderStructureService;
+
     @PostMapping(value = "/uploadFile")
     @Override
     public UploadFileResponseDTO uploadFile(@RequestParam("file") MultipartFile file) {
-        var fileName = service.storeFile(file);
+        var fileName = service.storeFile(file, 8L);
+
+        folderStructureService.addFile(
+            8L,
+            file.getContentType(),
+            fileName,
+            "C:/Temp/cloudkeeper/files/8/" + fileName,
+            file.getSize()
+        );
+
         var downloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/api/file/v1/downloadFile/")
             .path(fileName)
@@ -43,7 +56,9 @@ public class FileStorageController implements FileStorageControllerDocs {
 
     @PostMapping(value = "uploadMultipleFile")
     @Override
-    public List<UploadFileResponseDTO> uploadMulitpleFiles(@RequestParam("files") MultipartFile[] files) {
+    public List<UploadFileResponseDTO> uploadMulitpleFiles(
+        @RequestParam("files") MultipartFile[] files
+    ) {
         return Arrays.stream(files)
             .map(file -> uploadFile(file))
             .collect(Collectors.toList());

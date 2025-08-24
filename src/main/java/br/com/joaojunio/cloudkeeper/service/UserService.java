@@ -2,6 +2,7 @@ package br.com.joaojunio.cloudkeeper.service;
 
 import br.com.joaojunio.cloudkeeper.data.dto.user.UserDTO;
 import br.com.joaojunio.cloudkeeper.exceptions.NotFoundException;
+import br.com.joaojunio.cloudkeeper.model.FolderStructure;
 import br.com.joaojunio.cloudkeeper.model.User;
 import br.com.joaojunio.cloudkeeper.repositories.UserRepository;
 import org.slf4j.Logger;
@@ -24,6 +25,9 @@ public class UserService {
     @Autowired
     UserRepository repository;
 
+    @Autowired
+    FolderStructureService folderStructureService;
+
     public List<UserDTO> findAll() {
 
         logger.info("Finding all User");
@@ -42,6 +46,15 @@ public class UserService {
         return dto;
     }
 
+    public UserDTO findByUserTestFile() {
+
+        var entity = repository.findById(2L)
+            .orElseThrow(() -> new NotFoundException("Not Found this ID : " + 2L));
+
+        var dto = parseObject(entity, UserDTO.class);
+        return dto;
+    }
+
     public UserDTO create(UserDTO user) {
 
         logger.info("Creating new User");
@@ -49,16 +62,10 @@ public class UserService {
         var entity = parseObject(user, User.class);
         var entitySaved = repository.save(entity);
 
-        if (entitySaved == null) {
-            throw new IllegalArgumentException("User Entity of null");
-        }
-
-
+        folderStructureService.createUserFolderStructure(parseObject(entitySaved, UserDTO.class));
 
         return parseObject(entitySaved, UserDTO.class);
     }
-
-
 
     public UserDTO update(UserDTO user) {
 

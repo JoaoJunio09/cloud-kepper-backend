@@ -29,7 +29,7 @@ public class User {
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private FolderStructure folderStructure;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
