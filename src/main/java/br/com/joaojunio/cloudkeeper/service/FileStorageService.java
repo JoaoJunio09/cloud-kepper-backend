@@ -19,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Optional;
 
 @Service
 public class FileStorageService {
@@ -52,9 +51,6 @@ public class FileStorageService {
             logger.info("Coping file of memory");
 
             String pathToSaveUserFile = createUniqueFolderForUserToSaveFiles(this.fileStorageLocation, userId);
-
-
-
             Path newPathToSaveTheFile = Paths.get(pathToSaveUserFile).toAbsolutePath().normalize();
 
             Path targetLocation = newPathToSaveTheFile.resolve(fileName);
@@ -85,46 +81,6 @@ public class FileStorageService {
         }
         catch (Exception e) {
             throw new FileStorageException("Sorry! Error in load file for return resource", e);
-        }
-    }
-
-    public FolderNode createNewFolder(Long userId, String folderNameExists, String name) {
-        try {
-            Optional<Path> found = findFolder(folderNameExists, userId);
-
-            if (found.isPresent()) {
-                Path folderPath = found.get();
-                String pathNewFolder = folderPath + "/" + name;
-                File newFolder = new File(pathNewFolder);
-
-                if (!newFolder.exists()) {
-                    newFolder.mkdirs();
-                }
-            }
-            else {
-                String pathNewFolder = fileStorageLocation + "/" + name;
-                File newFolder = new File(pathNewFolder);
-
-                if (!newFolder.exists()) {
-                    newFolder.mkdirs();
-                }
-            }
-
-            return new FolderNode(name);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
-    }
-
-    private Optional<Path> findFolder(String folderName, Long userId) throws IOException {
-        Path pathUserFolder = Path.of(fileStorageLocation + "/" + userId);
-        try (var paths = Files.walk(pathUserFolder)) {
-            return paths
-                .filter(Files::isDirectory)
-                .filter(path -> path.getFileName().toString().equals(folderName))
-                .findFirst();
         }
     }
 

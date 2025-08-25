@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "api/file/v1")
@@ -42,15 +40,6 @@ public class FileStorageController implements FileStorageControllerDocs {
         @RequestParam("folderName") String folderName
     ) {
         var fileName = service.storeFile(file, 8L, folderName);
-
-        //folderStructureService.addFile(
-          //  8L,
-            //file.getContentType(),
-            //fileName,
-            //"C:/Temp/cloudkeeper/files/8/" + fileName,
-            //file.getSize()
-        //);
-
         var downloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/api/file/v1/downloadFile/")
             .path(fileName)
@@ -92,23 +81,6 @@ public class FileStorageController implements FileStorageControllerDocs {
                 "attachment; filename=\"" + fileName + "\""
             )
             .body(resource);
-    }
-
-    @GetMapping(
-        value = "/addNewFolder",
-        produces = {
-            MediaType.APPLICATION_JSON_VALUE,
-            MediaType.APPLICATION_XML_VALUE,
-            MediaType.APPLICATION_YAML_VALUE
-        }
-    )
-    @Override
-    public ResponseEntity<FolderNode> createFolder(
-        @RequestParam("id") Long userId,
-        @RequestParam("folderNameExists") String folderNameExists,
-        @RequestParam("folderName") String folderName
-    ) {
-        return ResponseEntity.ok().body(service.createNewFolder(userId ,folderNameExists, folderName));
     }
 
 
