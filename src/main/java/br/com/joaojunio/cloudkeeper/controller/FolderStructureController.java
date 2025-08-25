@@ -27,21 +27,5 @@ public class FolderStructureController {
         return ResponseEntity.ok().body(service.findAll());
     }
 
-    @PostMapping(
-        value = "/addFolder",
-        produces = {
-            MediaType.APPLICATION_JSON_VALUE,
-            MediaType.APPLICATION_XML_VALUE,
-            MediaType.APPLICATION_YAML_VALUE
-        }
-    )
-    public ResponseEntity<?> createNewFolderOrAddNewFile(
-        @PathVariable("userId") Long userId,
-        @RequestParam("name") String name
-        // HttpSession session
-    ) {
-        // Long userId = (Long) session.getAttribute("userId");
-        service.addFolder(2L, name);
-        return ResponseEntity.ok().body("Folder creating success!");
-    }
+
 }

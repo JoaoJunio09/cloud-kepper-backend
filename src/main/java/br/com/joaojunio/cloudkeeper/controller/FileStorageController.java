@@ -2,6 +2,7 @@ package br.com.joaojunio.cloudkeeper.controller;
 
 import br.com.joaojunio.cloudkeeper.controller.docs.FileStorageControllerDocs;
 import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
+import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FolderNode;
 import br.com.joaojunio.cloudkeeper.service.FileStorageService;
 import br.com.joaojunio.cloudkeeper.service.FolderStructureService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,16 +37,19 @@ public class FileStorageController implements FileStorageControllerDocs {
 
     @PostMapping(value = "/uploadFile")
     @Override
-    public UploadFileResponseDTO uploadFile(@RequestParam("file") MultipartFile file) {
-        var fileName = service.storeFile(file, 8L);
+    public UploadFileResponseDTO uploadFile(
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("folderName") String folderName
+    ) {
+        var fileName = service.storeFile(file, 8L, folderName);
 
-        folderStructureService.addFile(
-            8L,
-            file.getContentType(),
-            fileName,
-            "C:/Temp/cloudkeeper/files/8/" + fileName,
-            file.getSize()
-        );
+        //folderStructureService.addFile(
+          //  8L,
+            //file.getContentType(),
+            //fileName,
+            //"C:/Temp/cloudkeeper/files/8/" + fileName,
+            //file.getSize()
+        //);
 
         var downloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
             .path("/api/file/v1/downloadFile/")
@@ -54,17 +58,18 @@ public class FileStorageController implements FileStorageControllerDocs {
         return new UploadFileResponseDTO(fileName, downloadUri, file.getContentType(), file.getSize());
     }
 
-    @PostMapping(value = "uploadMultipleFile")
+    @PostMapping(value = "/uploadMultipleFile")
     @Override
     public List<UploadFileResponseDTO> uploadMulitpleFiles(
         @RequestParam("files") MultipartFile[] files
     ) {
-        return Arrays.stream(files)
-            .map(file -> uploadFile(file))
-            .collect(Collectors.toList());
+        //return Arrays.stream(files)
+          //  .map(file -> uploadFile(file))
+            //.collect(Collectors.toList());
+        return null;
     }
 
-    @GetMapping(value = "downloadFile/..+")
+    @GetMapping(value = "/downloadFile/..+")
     @Override
     public ResponseEntity<Resource> downloadFile(String fileName, HttpServletRequest request) {
         Resource resource = service.loadFileAsResource(fileName);
@@ -88,4 +93,23 @@ public class FileStorageController implements FileStorageControllerDocs {
             )
             .body(resource);
     }
+
+    @GetMapping(
+        value = "/addNewFolder",
+        produces = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_XML_VALUE,
+            MediaType.APPLICATION_YAML_VALUE
+        }
+    )
+    @Override
+    public ResponseEntity<FolderNode> createFolder(
+        @RequestParam("id") Long userId,
+        @RequestParam("folderNameExists") String folderNameExists,
+        @RequestParam("folderName") String folderName
+    ) {
+        return ResponseEntity.ok().body(service.createNewFolder(userId ,folderNameExists, folderName));
+    }
+
+
 }
