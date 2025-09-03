@@ -1,7 +1,5 @@
 package br.com.joaojunio.cloudkeeper.data.dto.file;
 
-import br.com.joaojunio.cloudkeeper.data.dto.user.UserDTO;
-
 import java.util.Objects;
 public class FileCreateRequestDTO {
 

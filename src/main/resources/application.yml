@@ -2,7 +2,12 @@ cors:
   originPatterns: http://localhost:8080,http://localhost:5050
 file:
   uploadDir: C:/Temp/cloudkeeper/files
-  folderStructure: C:/Tempo/cloudkeeper/folder_structure
+  folderStructure: C:/Temp/cloudkeeper/folder_structure
+b2:
+  keyId: 005df139ad1f5050000000001
+  applicationKey: K005ET3/1hVihGGEI4Kk5JIROkJtnX8
+  bucketName: cloudkeeper
+  userAgent: cloudkeeper/0.0.1
 spring:
   application:
     name: cloudkeeper
@@ -28,3 +33,7 @@ spring-doc:
   path-to-match: /api/**/v1/**
   swagger-ui:
     use-root-path: true
+
+# Chave de acesso ao Blackblaze - cloudkeeper
+# id da key = 005df139ad1f5050000000001
+# key = K005ET3/1hVihGGEI4Kk5JIROkJtnX8

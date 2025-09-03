@@ -5,16 +5,14 @@ public class FileAddedToTheStructureDTO {
     private Long userId;
     private String type;
     private String name;
-    private String localStorage;
     private Long size;
 
     public FileAddedToTheStructureDTO() {}
 
-    public FileAddedToTheStructureDTO(Long userId, String type, String name, String localStorage, Long size) {
+    public FileAddedToTheStructureDTO(Long userId, String type, String name, Long size) {
         this.userId = userId;
         this.type = type;
         this.name = name;
-        this.localStorage = localStorage;
         this.size = size;
     }
 
@@ -40,14 +38,6 @@ public class FileAddedToTheStructureDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getLocalStorage() {
-        return localStorage;
-    }
-
-    public void setLocalStorage(String localStorage) {
-        this.localStorage = localStorage;
     }
 
     public Long getSize() {

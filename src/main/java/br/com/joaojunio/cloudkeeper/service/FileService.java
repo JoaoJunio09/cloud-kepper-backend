@@ -23,7 +23,6 @@ public class FileService {
     UserRepository userRepository;
 
     public void create(FileCreateRequestDTO file) {
-
         logger.info("Creating a new file");
 
         var user = userRepository.findById(file.getUserId())

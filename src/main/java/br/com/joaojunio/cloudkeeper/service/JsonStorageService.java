@@ -7,8 +7,11 @@ import br.com.joaojunio.cloudkeeper.data.dto.json.ObjectToGenerateJsonDTO;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.UserStructure;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FileNode;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FolderNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +27,7 @@ import java.util.Map;
 public class JsonStorageService {
 
     @Value("${file.folderStructure:default}")
-    private final String folderStructurePath = "";
+    private String folderStructurePath = "";
 
     private final Logger logger = LoggerFactory.getLogger(JsonStorageService.class.getName());
 
@@ -49,7 +52,7 @@ public class JsonStorageService {
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
             String fileName = "user_" + object.getUserId() + ".json";
-            File file = Paths.get(object.getPath(), fileName).toFile();
+            File file = Paths.get(object.getPath().getFolderStructure(), fileName).toFile();
 
             objectMapper.writeValue(file, userStructure);
 
@@ -62,6 +65,7 @@ public class JsonStorageService {
             );
         }
         catch (Exception e) {
+            e.printStackTrace();
             throw new InternalError("Sorry! Critical error generating json object");
         }
     }
@@ -89,7 +93,9 @@ public class JsonStorageService {
         }
     }
 
-    public void addFile(FileAddedToTheStructureDTO fileAdded) {
+    // vou adicionar o arquivo dentro da pasta (percorro o json e procuro ela)
+    // se a pasta nao existir, o arquivo sera adicionado na pasta raiz
+    public void addFile(FileAddedToTheStructureDTO fileAdded, String folderName) {
 
         logger.info("Creating a new File in folder structure");
 
@@ -105,13 +111,18 @@ public class JsonStorageService {
 
             FileNode newFile = new FileNode(
                 fileAdded.getName(),
-                fileAdded.getLocalStorage(),
-                fileAdded.getLocalStorage(),
+                fileAdded.getType(),
                 fileAdded.getSize()
             );
+
+            boolean added = addFileToFolder(rootFolder, folderName, newFile);
+            if (!added) {
+                rootFolder.addChild(newFile);
+            }
+
             rootFolder.addChild(newFile);
 
-            userStructure.structure.put("root", rootFolder);
+            userStructure.structure.put("root", objectMapper.convertValue(rootFolder, JsonNode.class));
 
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.writeValue(file, userStructure);
@@ -120,5 +131,21 @@ public class JsonStorageService {
             e.printStackTrace();
             throw new RuntimeException();
         }
+    }
+
+    private boolean addFileToFolder(FolderNode currentFolder, String folderName, FileNode newFile) {
+        if (currentFolder.getName().equals(folderName)) {
+            currentFolder.addChild(newFile);
+            return true;
+        }
+
+        for (Object child : currentFolder.getChildren()) {
+            if (child instanceof  FolderNode) {
+                boolean added = addFileToFolder((FolderNode) child, folderName, newFile);
+                if (added) return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface FileStorageControllerDocs {
-    UploadFileResponseDTO uploadFile(MultipartFile file, String folderName);
+    ResponseEntity<UploadFileResponseDTO> uploadFile(Long id, MultipartFile file, String folderName);
     List<UploadFileResponseDTO> uploadMulitpleFiles(MultipartFile[] files);
     ResponseEntity<Resource> downloadFile(String fileName, HttpServletRequest request);
 }

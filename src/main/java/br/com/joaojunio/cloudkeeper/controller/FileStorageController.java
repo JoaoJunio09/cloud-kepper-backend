@@ -33,18 +33,14 @@ public class FileStorageController implements FileStorageControllerDocs {
     @Autowired
     private FolderStructureService folderStructureService;
 
-    @PostMapping(value = "/uploadFile")
+    @PostMapping(value = "/uploadFile/{id}")
     @Override
-    public UploadFileResponseDTO uploadFile(
+    public ResponseEntity<UploadFileResponseDTO> uploadFile(
+        @PathVariable("id") Long id,
         @RequestParam("file") MultipartFile file,
         @RequestParam("folderName") String folderName
     ) {
-        var fileName = service.storeFile(file, 8L, folderName);
-        var downloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-            .path("/api/file/v1/downloadFile/")
-            .path(fileName)
-            .toUriString();
-        return new UploadFileResponseDTO(fileName, downloadUri, file.getContentType(), file.getSize());
+        return ResponseEntity.ok().body(service.upload(file, id, folderName));
     }
 
     @PostMapping(value = "/uploadMultipleFile")

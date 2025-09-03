@@ -32,8 +32,8 @@ public class ObjectToGenerateJsonDTO {
         this.userName = userName;
     }
 
-    public String getPath() {
-        return String.valueOf(path);
+    public FolderStructurePathConfig getPath() {
+        return path;
     }
 
     public void setPath(FolderStructurePathConfig path) {

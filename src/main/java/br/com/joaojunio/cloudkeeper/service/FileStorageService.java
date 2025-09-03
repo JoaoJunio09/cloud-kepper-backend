@@ -1,24 +1,18 @@
 package br.com.joaojunio.cloudkeeper.service;
 
 import br.com.joaojunio.cloudkeeper.config.FileStorageConfig;
-import br.com.joaojunio.cloudkeeper.data.dto.file.FileCreateRequestDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.json.FileAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.exceptions.FileStorageException;
-import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FolderNode;
+import com.backblaze.b2.client.structures.B2FileVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 @Service
 public class FileStorageService {
@@ -28,78 +22,39 @@ public class FileStorageService {
     @Autowired
     private FileService fileService;
 
-    private final Path fileStorageLocation;
+    @Autowired
+    private CloudFileStorageService cloudFileService;
 
     @Autowired
-    public FileStorageService(FileStorageConfig fileStorageConfig) {
-         Path path = Paths.get(fileStorageConfig.getUploadDir()).toAbsolutePath().normalize();
-         fileStorageLocation = path;
+    private LocalFileStorageService localFileService;
 
-         try {
-             logger.info("Creating Directories");
-             Files.createDirectories(fileStorageLocation);
-         }
-         catch (Exception e) {
-             throw new FileStorageException("Sorry! Error in creating Directories", e);
-         }
-    }
+    @Autowired
+    private JsonStorageService jsonStorageService;
 
-    public String storeFile(MultipartFile file, Long userId, String folderName) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+    public UploadFileResponseDTO upload(MultipartFile file, Long userId, String folderName) {
+        logger.info("Uploading Files");
+
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
         try {
-            logger.info("Coping file of memory");
+            jsonStorageService.addFile(
+                new FileAddedToTheStructureDTO(
+                    userId,
+                    file.getContentType(),
+                    fileName,
+                    file.getSize()
+                ), folderName
+            );
 
-            String pathToSaveUserFile = createUniqueFolderForUserToSaveFiles(this.fileStorageLocation, userId);
-            Path newPathToSaveTheFile = Paths.get(pathToSaveUserFile).toAbsolutePath().normalize();
+            B2FileVersion fileVersion = cloudFileService.uploadFile(file);
+            localFileService.storeFile(file, userId);
 
-            Path targetLocation = newPathToSaveTheFile.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-            FileCreateRequestDTO fileCreateDTO = new FileCreateRequestDTO();
-            fileCreateDTO.setName(fileName);
-            fileCreateDTO.setSize(file.getSize());
-            fileCreateDTO.setType(file.getContentType());
-            fileCreateDTO.setStorageLocation(String.valueOf(targetLocation));
-            fileCreateDTO.setUserId(userId);
-            fileService.create(fileCreateDTO);
-
-            return fileName;
+            UploadFileResponseDTO responseDTO = new UploadFileResponseDTO();
+            return responseDTO;
         }
         catch (Exception e) {
-            throw new FileStorageException("Sorry! Error in saving store file for memory", e);
+            throw new FileStorageException("Sorry! Unable to upload file: " + fileName);
         }
     }
 
-    public Resource loadFileAsResource(String fileName) {
-        try {
-            logger.info("Loading file as return Resource");
-
-            Path filePath = this.fileStorageLocation.resolve(fileName);
-            Resource resource = new UrlResource(filePath.toUri());
-            return resource;
-        }
-        catch (Exception e) {
-            throw new FileStorageException("Sorry! Error in load file for return resource", e);
-        }
-    }
-
-    private String createUniqueFolderForUserToSaveFiles(Path fileStorageLocation, Long userId) {
-        try {
-            String pathToSaveUserFile = fileStorageLocation + "/" + userId;
-            File newFolderOfUser = new File(pathToSaveUserFile);
-
-            if (!newFolderOfUser.exists()) {
-                boolean success = newFolderOfUser.mkdirs();
-                if (!success) {
-                    throw new IllegalArgumentException("Impossible create new Folder of User");
-                }
-            }
-
-            return pathToSaveUserFile;
-        }
-        catch (Exception e) {
-            throw new RuntimeException();
-        }
-    }
 }

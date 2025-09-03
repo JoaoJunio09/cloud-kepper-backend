@@ -4,15 +4,13 @@ public class FileNode {
 
     public String type = "file";
     public String name;
-    public String localStorage;
     public String fileType;
     public Long size;
 
     public FileNode() {}
 
-    public FileNode(String name, String localStorage, String fileType, Long size) {
+    public FileNode(String name, String fileType, Long size) {
         this.name = name;
-        this.localStorage = localStorage;
         this.fileType = fileType;
         this.size = size;
     }
@@ -31,14 +29,6 @@ public class FileNode {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getLocalStorage() {
-        return localStorage;
-    }
-
-    public void setLocalStorage(String localStorage) {
-        this.localStorage = localStorage;
     }
 
     public String getFileType() {
