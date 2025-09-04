@@ -36,7 +36,7 @@ public class LocalFileStorageService {
         }
     }
 
-    public void storeFile(MultipartFile file, Long userId) {
+    public String storeFile(MultipartFile file, Long userId) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         try {
@@ -48,7 +48,7 @@ public class LocalFileStorageService {
             Path targetLocation = newPathToSaveTheFile.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            //return fileName;
+            return fileName;
         }
         catch (Exception e) {
             throw new FileStorageException("Sorry! Error in saving store file for memory", e);

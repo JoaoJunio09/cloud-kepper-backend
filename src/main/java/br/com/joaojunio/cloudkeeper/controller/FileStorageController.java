@@ -57,6 +57,7 @@ public class FileStorageController implements FileStorageControllerDocs {
     @GetMapping(value = "/downloadFile/..+")
     @Override
     public ResponseEntity<Resource> downloadFile(String fileName, HttpServletRequest request) {
+        /*
         Resource resource = service.loadFileAsResource(fileName);
         String contentType = null;
         try {
@@ -77,6 +78,9 @@ public class FileStorageController implements FileStorageControllerDocs {
                 "attachment; filename=\"" + fileName + "\""
             )
             .body(resource);
+
+         */
+        return null;
     }
 
 

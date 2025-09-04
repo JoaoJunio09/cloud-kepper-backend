@@ -4,9 +4,10 @@ file:
   uploadDir: C:/Temp/cloudkeeper/files
   folderStructure: C:/Temp/cloudkeeper/folder_structure
 b2:
-  accountId: 005df139ad1f5050000000001
+  keyId: 005df139ad1f5050000000001
   applicationKey: K005ET3/1hVihGGEI4Kk5JIROkJtnX8
   bucketName: cloudkeeper
+  userAgent: cloudkeeper/0.0.1
 spring:
   application:
     name: cloudkeeper

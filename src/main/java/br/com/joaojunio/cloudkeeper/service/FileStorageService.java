@@ -47,9 +47,14 @@ public class FileStorageService {
             );
 
             B2FileVersion fileVersion = cloudFileService.uploadFile(file);
+
             localFileService.storeFile(file, userId);
 
             UploadFileResponseDTO responseDTO = new UploadFileResponseDTO();
+            responseDTO.setFileName(fileVersion.getFileName());
+            responseDTO.setSize(fileVersion.getContentLength());
+            responseDTO.setType(fileVersion.getContentType());
+            responseDTO.setTimestamp(fileVersion.getUploadTimestamp());
             return responseDTO;
         }
         catch (Exception e) {

@@ -96,7 +96,6 @@ public class JsonStorageService {
     // vou adicionar o arquivo dentro da pasta (percorro o json e procuro ela)
     // se a pasta nao existir, o arquivo sera adicionado na pasta raiz
     public void addFile(FileAddedToTheStructureDTO fileAdded, String folderName) {
-
         logger.info("Creating a new File in folder structure");
 
         try {
@@ -117,10 +116,8 @@ public class JsonStorageService {
 
             boolean added = addFileToFolder(rootFolder, folderName, newFile);
             if (!added) {
-                rootFolder.addChild(newFile);
+                throw new RuntimeException("Folder '" + folderName + "' not found!");
             }
-
-            rootFolder.addChild(newFile);
 
             userStructure.structure.put("root", objectMapper.convertValue(rootFolder, JsonNode.class));
 
@@ -134,15 +131,23 @@ public class JsonStorageService {
     }
 
     private boolean addFileToFolder(FolderNode currentFolder, String folderName, FileNode newFile) {
-        if (currentFolder.getName().equals(folderName)) {
+        if (currentFolder.getName().trim().equalsIgnoreCase(folderName)) {
             currentFolder.addChild(newFile);
             return true;
         }
 
         for (Object child : currentFolder.getChildren()) {
-            if (child instanceof  FolderNode) {
-                boolean added = addFileToFolder((FolderNode) child, folderName, newFile);
-                if (added) return true;
+            JsonNode childNode = objectMapper.valueToTree(child);
+
+            if ("folder".equals(childNode.get("type").asText())) {
+                FolderNode folderChild = objectMapper.convertValue(childNode, FolderNode.class);
+
+                boolean added = addFileToFolder(folderChild, folderName, newFile);
+                if (added) {
+                    currentFolder.getChildren().remove(child);
+                    currentFolder.getChildren().add(folderChild);
+                    return true;
+                };
             }
         }
 

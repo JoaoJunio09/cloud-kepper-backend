@@ -46,8 +46,8 @@ public class CloudFileStorageService {
         logger.info("Saving in Cloud");
 
         if (file == null) {
-            throw        new RuntimeException("Could not to cloud, file is null!");
-    }
+            throw new RuntimeException("Could not to cloud, file is null!");
+        }
 
         final B2Bucket bucket = getBucket();
         final String bucketId = bucket.getBucketId();

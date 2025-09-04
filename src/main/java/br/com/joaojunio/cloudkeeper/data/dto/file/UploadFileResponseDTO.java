@@ -10,13 +10,13 @@ public class UploadFileResponseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String fileName;
-    private String fileNameUri;
     private String type;
     private Long size;
+    private Long timestamp;
 
-    public UploadFileResponseDTO(String fileName, String fileNameUri, String type, Long size) {
+    public UploadFileResponseDTO(String fileName, Long timestamp, String type, Long size) {
         this.fileName = fileName;
-        this.fileNameUri = fileNameUri;
+        this.timestamp = timestamp;
         this.type = type;
         this.size = size;
     }
@@ -31,12 +31,12 @@ public class UploadFileResponseDTO implements Serializable {
         this.fileName = fileName;
     }
 
-    public String getFileNameUri() {
-        return fileNameUri;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
-    public void setFileNameUri(String fileNameUri) {
-        this.fileNameUri = fileNameUri;
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getType() {
@@ -59,11 +59,11 @@ public class UploadFileResponseDTO implements Serializable {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         UploadFileResponseDTO that = (UploadFileResponseDTO) o;
-        return Objects.equals(getFileName(), that.getFileName()) && Objects.equals(getFileNameUri(), that.getFileNameUri()) && Objects.equals(getType(), that.getType()) && Objects.equals(getSize(), that.getSize());
+        return Objects.equals(getFileName(), that.getFileName()) && Objects.equals(getType(), that.getType()) && Objects.equals(getSize(), that.getSize()) && Objects.equals(getTimestamp(), that.getTimestamp());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFileName(), getFileNameUri(), getType(), getSize());
+        return Objects.hash(getFileName(), getType(), getSize(), getTimestamp());
     }
 }
