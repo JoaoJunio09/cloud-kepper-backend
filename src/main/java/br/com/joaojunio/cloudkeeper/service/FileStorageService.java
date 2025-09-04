@@ -8,6 +8,7 @@ import com.backblaze.b2.client.structures.B2FileVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,6 +56,7 @@ public class FileStorageService {
             responseDTO.setSize(fileVersion.getContentLength());
             responseDTO.setType(fileVersion.getContentType());
             responseDTO.setTimestamp(fileVersion.getUploadTimestamp());
+
             return responseDTO;
         }
         catch (Exception e) {
@@ -62,4 +64,7 @@ public class FileStorageService {
         }
     }
 
+    public Resource download(String fileName) {
+
+    }
 }
