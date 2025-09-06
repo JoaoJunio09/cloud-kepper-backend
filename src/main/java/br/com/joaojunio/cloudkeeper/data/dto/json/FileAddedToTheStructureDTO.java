@@ -3,17 +3,27 @@ package br.com.joaojunio.cloudkeeper.data.dto.json;
 public class FileAddedToTheStructureDTO {
 
     private Long userId;
+    private String fileId;
     private String type;
     private String name;
     private Long size;
 
     public FileAddedToTheStructureDTO() {}
 
-    public FileAddedToTheStructureDTO(Long userId, String type, String name, Long size) {
+    public FileAddedToTheStructureDTO(String fileId, Long userId, String type, String name, Long size) {
+        this.fileId = fileId;
         this.userId = userId;
         this.type = type;
         this.name = name;
         this.size = size;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
     public Long getUserId() {

@@ -8,11 +8,14 @@ import com.backblaze.b2.client.structures.B2FileVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -38,18 +41,18 @@ public class FileStorageService {
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
         try {
+            B2FileVersion fileVersion = cloudFileService.uploadFile(file);
+            localFileService.storeFile(file, userId);
+
             jsonStorageService.addFile(
                 new FileAddedToTheStructureDTO(
+                    fileVersion.getFileId(),
                     userId,
                     file.getContentType(),
                     fileName,
                     file.getSize()
                 ), folderName
             );
-
-            B2FileVersion fileVersion = cloudFileService.uploadFile(file);
-
-            localFileService.storeFile(file, userId);
 
             UploadFileResponseDTO responseDTO = new UploadFileResponseDTO();
             responseDTO.setFileName(fileVersion.getFileName());
@@ -64,7 +67,34 @@ public class FileStorageService {
         }
     }
 
-    public Resource download(String fileName) {
+    public Resource download(String fileId) {
+        logger.info("Downloading Files");
 
+        try {
+            Resource resource = cloudFileService.downloadFile(fileId);
+
+            if (!resource.exists()) {
+                throw new IllegalArgumentException("Resource for file is null");
+            }
+
+            return resource;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new FileStorageException("Sorry! Error in downloading file");
+        }
     }
+
+    public String getFileName(String fileId) {
+        try {
+            B2FileVersion fileVersion = cloudFileService.getFileVersion(fileId);
+            if (fileVersion != null && fileVersion.getFileName() != null) {
+                return fileVersion.getFileName();
+            }
+        } catch (Exception e) {
+            logger.error("Could not get fileName for fileId {}", fileId, e);
+        }
+        return "unknown-file";
+    }
+
 }

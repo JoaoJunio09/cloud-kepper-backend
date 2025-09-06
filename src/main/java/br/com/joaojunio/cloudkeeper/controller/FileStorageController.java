@@ -2,7 +2,7 @@ package br.com.joaojunio.cloudkeeper.controller;
 
 import br.com.joaojunio.cloudkeeper.controller.docs.FileStorageControllerDocs;
 import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
-import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FolderNode;
+import br.com.joaojunio.cloudkeeper.service.CloudFileStorageService;
 import br.com.joaojunio.cloudkeeper.service.FileStorageService;
 import br.com.joaojunio.cloudkeeper.service.FolderStructureService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,14 +10,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URLConnection;
 import java.util.List;
 
 @RestController
@@ -29,6 +30,9 @@ public class FileStorageController implements FileStorageControllerDocs {
 
     @Autowired
     private FileStorageService service;
+
+    @Autowired
+    private CloudFileStorageService cloudFileStorageService;
 
     @Autowired
     private FolderStructureService folderStructureService;
@@ -54,33 +58,36 @@ public class FileStorageController implements FileStorageControllerDocs {
         return null;
     }
 
-    @GetMapping(value = "/downloadFile/..+")
+    @GetMapping(value = "/{type}/{fileId}")
     @Override
-    public ResponseEntity<Resource> downloadFile(String fileName, HttpServletRequest request) {
-        /*
-        Resource resource = service.loadFileAsResource(fileName);
-        String contentType = null;
+    public ResponseEntity<Resource> downloadFile(
+        @PathVariable("type") String type,
+        @PathVariable("fileId") String fileId
+    ) {
+        Resource resource = service.download(fileId);
+
+        String fileName = "";
         try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+            fileName = service.getFileName(fileId);
         }
         catch (Exception e) {
-            logger.error("Could not determine file type!");
+            logger.error("Error in fileName");
         }
 
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
+        String contentType = URLConnection.guessContentTypeFromName(fileName);
+        contentType = contentType == null ? "application/octet-stream" : "";
+
+        String dispositon = type.equals("preview")
+            ? "inline"
+            : "attachment";
 
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(contentType))
             .header(
                 HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + fileName + "\""
+                dispositon + "; filename=\"" + fileName + "\""
             )
             .body(resource);
-
-         */
-        return null;
     }
 
 

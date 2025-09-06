@@ -5,6 +5,7 @@ import br.com.joaojunio.cloudkeeper.exceptions.FileStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -72,5 +73,9 @@ public class LocalFileStorageService {
         catch (Exception e) {
             throw new RuntimeException();
         }
+    }
+
+    public Resource downloadFile(String fileName) {
+        return null;
     }
 }

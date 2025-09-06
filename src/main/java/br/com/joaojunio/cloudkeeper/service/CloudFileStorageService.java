@@ -12,12 +12,13 @@ import com.backblaze.b2.client.structures.B2ListFileNamesRequest;
 import com.backblaze.b2.client.structures.B2UploadFileRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,21 +64,24 @@ public class CloudFileStorageService {
         return client.uploadSmallFile(request);
     }
 
-    public InputStream downloadFile(String fileName) throws Exception {
-        B2Bucket bucket = getBucket();
-        B2FileVersion fileVersion = client.getFileInfoByName(bucket.getBucketName(), fileName);
+    public Resource downloadFile(String fileId) throws Exception {
+        B2FileVersion fileVersion = client.getFileInfo(fileId);
+        String fileName = fileVersion.getFileName();
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        B2ContentSink sink = (headers, inputStream) -> inputStream.transferTo(outputStream);
+        client.downloadById(fileId, sink);
 
-        B2ContentSink sink = (headers, inputStream) -> {
-            try (InputStream in = inputStream) {
-                in.transferTo(outputStream);
+        byte[] data = outputStream.toByteArray();
+
+        return new ByteArrayResource(data) {
+            @Override
+            public String getFilename() {
+                return fileName;
             }
         };
-
-        client.downloadById(fileVersion.getFileId(), sink);
-        return new ByteArrayInputStream(outputStream.toByteArray());
     }
+
 
     public List<B2FileVersion> listFiles(int maxFiles) throws Exception {
         B2Bucket bucket = getBucket();
@@ -100,4 +104,9 @@ public class CloudFileStorageService {
         B2FileVersion file = client.getFileInfoByName(bucket.getBucketName(), fileName);
         client.deleteFileVersion(file);
     }
+
+    public B2FileVersion getFileVersion(String fileId) throws B2Exception {
+        return client.getFileInfo(fileId);
+    }
+
 }

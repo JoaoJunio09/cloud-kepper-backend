@@ -3,16 +3,26 @@ package br.com.joaojunio.cloudkeeper.model.folderStructure.node;
 public class FileNode {
 
     public String type = "file";
+    public String fileId;
     public String name;
     public String fileType;
     public Long size;
 
     public FileNode() {}
 
-    public FileNode(String name, String fileType, Long size) {
+    public FileNode(String fileId, String name, String fileType, Long size) {
+        this.fileId = fileId;
         this.name = name;
         this.fileType = fileType;
         this.size = size;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
     public String getType() {
