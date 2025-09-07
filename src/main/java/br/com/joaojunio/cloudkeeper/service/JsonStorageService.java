@@ -152,4 +152,8 @@ public class JsonStorageService {
 
         return false;
     }
+
+    public boolean removeFile(String fileName, String fileId) {
+        return false;
+    }
 }

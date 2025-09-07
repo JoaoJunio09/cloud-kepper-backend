@@ -8,19 +8,15 @@ import com.backblaze.b2.client.contentSources.B2ContentTypes;
 import com.backblaze.b2.client.exceptions.B2Exception;
 import com.backblaze.b2.client.structures.B2Bucket;
 import com.backblaze.b2.client.structures.B2FileVersion;
-import com.backblaze.b2.client.structures.B2ListFileNamesRequest;
 import com.backblaze.b2.client.structures.B2UploadFileRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class CloudFileStorageService {
@@ -82,27 +78,12 @@ public class CloudFileStorageService {
         };
     }
 
-
-    public List<B2FileVersion> listFiles(int maxFiles) throws Exception {
+    public B2FileVersion deleteFile(String fileId) throws B2Exception {
         B2Bucket bucket = getBucket();
-
-        B2ListFileNamesRequest request = B2ListFileNamesRequest
-            .builder(bucket.getBucketId())
-            .setMaxFileCount(maxFiles)
-            .build();
-
-        var iterable = client.fileNames(request);
-        List<B2FileVersion> result = new ArrayList<>();
-        for (B2FileVersion fv : iterable) {
-            result.add(fv);
-        }
-        return result;
-    }
-
-    public void deleteFile(String fileName) throws B2Exception {
-        B2Bucket bucket = getBucket();
+        String fileName = client.getFileInfo(fileId).getFileName();
         B2FileVersion file = client.getFileInfoByName(bucket.getBucketName(), fileName);
-        client.deleteFileVersion(file);
+        client.deleteFileVersion(fileName, fileId);
+        return file;
     }
 
     public B2FileVersion getFileVersion(String fileId) throws B2Exception {

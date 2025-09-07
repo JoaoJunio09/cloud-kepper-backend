@@ -1,6 +1,6 @@
 package br.com.joaojunio.cloudkeeper.service;
 
-import br.com.joaojunio.cloudkeeper.config.FileStorageConfig;
+import br.com.joaojunio.cloudkeeper.data.dto.file.DeleteFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FileAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.exceptions.FileStorageException;
@@ -8,14 +8,11 @@ import com.backblaze.b2.client.structures.B2FileVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
-import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -82,6 +79,38 @@ public class FileStorageService {
         catch (Exception e) {
             e.printStackTrace();
             throw new FileStorageException("Sorry! Error in downloading file");
+        }
+    }
+
+    public DeleteFileResponseDTO delete(String fileId) {
+        logger.info("Deleting one File");
+
+        try {
+            if (fileId.trim().equals("")) {
+                logger.info("File Id is empty or null!");
+            }
+
+            String fileName = getFileName(fileId);
+
+            boolean fileRemovingForFolderStructure = jsonStorageService.removeFile(fileName, fileId);
+
+            B2FileVersion fileVersion = fileRemovingForFolderStructure
+                ? cloudFileService.deleteFile(fileId)
+                : null;
+
+            if (fileVersion == null) {
+                logger.error("Error in deleting file");
+                throw new RuntimeException("Error in deleting file");
+            }
+
+            return new DeleteFileResponseDTO(
+                fileVersion.getFileName(),
+                fileVersion.getContentType(),
+                fileVersion.getContentLength()
+            );
+        }
+        catch (Exception e) {
+            throw new FileStorageException("Sorry! Error in deleting one file");
         }
     }
 
