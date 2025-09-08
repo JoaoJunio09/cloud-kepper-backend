@@ -3,6 +3,7 @@ package br.com.joaojunio.cloudkeeper.service;
 import br.com.joaojunio.cloudkeeper.data.dto.file.DeleteFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FileAddedToTheStructureDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.json.FileRemovedFromStructure;
 import br.com.joaojunio.cloudkeeper.exceptions.FileStorageException;
 import com.backblaze.b2.client.structures.B2FileVersion;
 import org.slf4j.Logger;
@@ -82,7 +83,7 @@ public class FileStorageService {
         }
     }
 
-    public DeleteFileResponseDTO delete(String fileId) {
+    public DeleteFileResponseDTO delete(Long userId, String fileId) {
         logger.info("Deleting one File");
 
         try {
@@ -90,9 +91,9 @@ public class FileStorageService {
                 logger.info("File Id is empty or null!");
             }
 
-            String fileName = getFileName(fileId);
-
-            boolean fileRemovingForFolderStructure = jsonStorageService.removeFile(fileName, fileId);
+            boolean fileRemovingForFolderStructure = jsonStorageService.removeFile(
+                new FileRemovedFromStructure(userId, fileId)
+            );
 
             B2FileVersion fileVersion = fileRemovingForFolderStructure
                 ? cloudFileService.deleteFile(fileId)
@@ -104,6 +105,7 @@ public class FileStorageService {
             }
 
             return new DeleteFileResponseDTO(
+                "File deleted successfully!",
                 fileVersion.getFileName(),
                 fileVersion.getContentType(),
                 fileVersion.getContentLength()

@@ -1,12 +1,10 @@
 package br.com.joaojunio.cloudkeeper.service;
 
-import br.com.joaojunio.cloudkeeper.data.dto.json.FileAddedToTheStructureDTO;
-import br.com.joaojunio.cloudkeeper.data.dto.json.FolderAddedToTheStructureDTO;
-import br.com.joaojunio.cloudkeeper.data.dto.json.GeneratedJsonObjectResponseDTO;
-import br.com.joaojunio.cloudkeeper.data.dto.json.ObjectToGenerateJsonDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.json.*;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.UserStructure;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FileNode;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FolderNode;
+import br.com.joaojunio.cloudkeeper.model.folderStructure.node.Node;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -136,24 +135,69 @@ public class JsonStorageService {
         }
 
         for (Object child : currentFolder.getChildren()) {
-            JsonNode childNode = objectMapper.valueToTree(child);
-
-            if ("folder".equals(childNode.get("type").asText())) {
-                FolderNode folderChild = objectMapper.convertValue(childNode, FolderNode.class);
-
+            if (child instanceof FolderNode folderChild) {
                 boolean added = addFileToFolder(folderChild, folderName, newFile);
                 if (added) {
-                    currentFolder.getChildren().remove(child);
-                    currentFolder.getChildren().add(folderChild);
                     return true;
-                };
+                }
             }
         }
 
         return false;
     }
 
-    public boolean removeFile(String fileName, String fileId) {
+    public boolean removeFile(FileRemovedFromStructure fileRemoved) {
+        logger.info("Deleting one File in folder structure");
+
+        try {
+            File file = new File(folderStructurePath + "/user_" + fileRemoved.getUserId() + ".json");
+
+            UserStructure userStructure = objectMapper.readValue(file, UserStructure.class);
+
+            FolderNode rootFolder = objectMapper.convertValue(
+                userStructure.getStructure().get("root"),
+                FolderNode.class
+            );
+
+            boolean remove = removeToFile(rootFolder, fileRemoved.getFileId());
+            if (!remove) {
+                logger.error("File to be deleted not found");
+                throw new RuntimeException("File to be deleted not found");
+            }
+
+            userStructure.getStructure().put("root", objectMapper.convertValue(rootFolder, JsonNode.class));
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.writeValue(file, userStructure);
+
+            logger.info("Successfully remove file in JSON!");
+            return true;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
+    private boolean removeToFile(FolderNode currentFolder, String fileId) {
+        Iterator<Node> iterator = currentFolder.getChildren().iterator();
+
+        while (iterator.hasNext()) {
+            Node child = iterator.next();
+
+            if (child instanceof FileNode fileNode) {
+                if (fileNode.getFileId().equals(fileId)) {
+                    iterator.remove();
+                    return true;
+                }
+            }
+            else if (child instanceof FolderNode folderNode) {
+                boolean removed = removeToFile(folderNode, fileId);
+                if (removed) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
+
 }

@@ -9,5 +9,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FileStorageControllerDocs {
     ResponseEntity<UploadFileResponseDTO> uploadFile(Long id, MultipartFile file, String folderName);
     ResponseEntity<Resource> downloadFile(String type, String fileId) throws Exception;
-    ResponseEntity<DeleteFileResponseDTO> delete(String fileId);
+    ResponseEntity<DeleteFileResponseDTO> delete(Long userId, String fileId);
 }

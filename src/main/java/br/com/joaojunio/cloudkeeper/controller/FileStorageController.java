@@ -61,7 +61,7 @@ public class FileStorageController implements FileStorageControllerDocs {
         }
 
         String contentType = URLConnection.guessContentTypeFromName(fileName);
-        contentType = contentType == null ? "application/octet-stream" : "";
+        contentType = contentType == null ? "application/octet-stream" : contentType;
 
         String dispositon = type.equals("preview")
             ? "inline"
@@ -76,9 +76,12 @@ public class FileStorageController implements FileStorageControllerDocs {
             .body(resource);
     }
 
-    @DeleteMapping(value = "/{fileId}")
+    @DeleteMapping(value = "/{userId}/{fileId}")
     @Override
-    public ResponseEntity<DeleteFileResponseDTO> delete(@PathVariable("fileId") String fileId) {
-        return ResponseEntity.ok().body(service.delete(fileId));
+    public ResponseEntity<DeleteFileResponseDTO> delete(
+        @PathVariable("userId") Long userId,
+        @PathVariable("fileId") String fileId
+    ) {
+        return ResponseEntity.ok().body(service.delete(userId, fileId));
     }
 }

@@ -3,43 +3,27 @@ package br.com.joaojunio.cloudkeeper.model.folderStructure.node;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FolderNode {
+public class FolderNode extends Node {
+    public List<Node> children = new ArrayList<>();
 
-    public String type = "folder";
-    public String name;
-    public List<Object> children = new ArrayList<>();
-
-    public FolderNode() {}
+    public FolderNode() {
+        setType("folder");
+    }
 
     public FolderNode(String name) {
-        this.name = name;
+        setType("folder");
+        setName(name);
     }
 
-    public void addChild(Object child) {
-        children.add(child);
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Object> getChildren() {
+    public List<Node> getChildren() {
         return children;
     }
 
-    public void setChildren(List<Object> children) {
+    public void setChildren(List<Node> children) {
         this.children = children;
+    }
+
+    public void addChild(Node child) {
+        children.add(child);
     }
 }

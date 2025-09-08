@@ -62,7 +62,6 @@ public class CloudFileStorageService {
 
     public Resource downloadFile(String fileId) throws Exception {
         B2FileVersion fileVersion = client.getFileInfo(fileId);
-        String fileName = fileVersion.getFileName();
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         B2ContentSink sink = (headers, inputStream) -> inputStream.transferTo(outputStream);
@@ -70,12 +69,7 @@ public class CloudFileStorageService {
 
         byte[] data = outputStream.toByteArray();
 
-        return new ByteArrayResource(data) {
-            @Override
-            public String getFilename() {
-                return fileName;
-            }
-        };
+        return new ByteArrayResource(data);
     }
 
     public B2FileVersion deleteFile(String fileId) throws B2Exception {
