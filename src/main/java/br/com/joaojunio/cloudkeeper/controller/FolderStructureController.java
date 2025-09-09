@@ -1,6 +1,7 @@
 package br.com.joaojunio.cloudkeeper.controller;
 
 import br.com.joaojunio.cloudkeeper.data.dto.folderStructure.FolderStructureDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.json.FolderAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.service.FolderStructureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -27,5 +28,23 @@ public class FolderStructureController {
         return ResponseEntity.ok().body(service.findAll());
     }
 
-
+    @GetMapping(
+        value = "/{userId}/{newFolderName}",
+        produces = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_XML_VALUE,
+            MediaType.APPLICATION_YAML_VALUE
+        }
+    )
+    public ResponseEntity<FolderAddedToTheStructureDTO> createFolder(
+        @PathVariable("userId") Long userId,
+        @PathVariable("newFolderName") String newFolderName,
+        @RequestParam("folderName") String folderName
+    ) {
+        return ResponseEntity.ok().body(
+            service.createFolderInStructure(
+                new FolderAddedToTheStructureDTO(userId, newFolderName, folderName)
+            )
+        );
+    }
 }

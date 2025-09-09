@@ -68,18 +68,26 @@ public class JsonStorageService {
     }
 
     public void addFolder(FolderAddedToTheStructureDTO folderAdded) {
-
-        logger.info("Creating a new Folder in folder structure");
+        logger.info("Manipulating json of structure to add new folder");
 
         try {
-            File file = new File(folderStructurePath + "user_" + folderAdded.getUserId() + ".json");
+            File file = new File(folderStructurePath + "/user_" + folderAdded.getUserId() + ".json");
 
             UserStructure userStructure = objectMapper.readValue(file, UserStructure.class);
 
-            FolderNode rootFolder = (FolderNode) userStructure.structure.get("root");
+            FolderNode rootFolder = objectMapper.convertValue(
+                userStructure.getStructure().get("root"),
+                FolderNode.class
+            );
 
-            FolderNode newFolder = new FolderNode(folderAdded.getName());
-            rootFolder.addChild(newFolder);
+            FolderNode newFolder = new FolderNode(folderAdded.getNewFolderName());
+
+            boolean added = addFolderToStructure(rootFolder, folderAdded.getFolderName(), newFolder);
+            if (!added) {
+                throw new RuntimeException("Folder '" + folderAdded.getFolderName() + "' not found!");
+            }
+
+            userStructure.getStructure().put("root", objectMapper.convertValue(rootFolder, JsonNode.class));
 
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.writeValue(file, userStructure);
@@ -88,6 +96,22 @@ public class JsonStorageService {
             e.printStackTrace();
             throw new RuntimeException();
         }
+    }
+
+    private boolean addFolderToStructure(FolderNode currentNode, String folderName, FolderNode newFolder) {
+        if (currentNode.getName().trim().equalsIgnoreCase(folderName)) {
+            currentNode.getChildren().add(newFolder);
+            return true;
+        }
+
+        for (Object child : currentNode.getChildren()) {
+            if (child instanceof FolderNode folderChild && folderChild.getName().equalsIgnoreCase(folderName)) {
+                boolean added = addFolderToStructure(folderChild, folderName, newFolder);
+                if (added) return true;
+            }
+        }
+
+        return false;
     }
 
     // vou adicionar o arquivo dentro da pasta (percorro o json e procuro ela)
@@ -106,10 +130,7 @@ public class JsonStorageService {
             );
 
             FileNode newFile = new FileNode(
-                fileAdded.getFileId(),
-                fileAdded.getName(),
-                fileAdded.getType(),
-                fileAdded.getSize()
+                fileAdded.getFileId(), fileAdded.getName(), fileAdded.getType(), fileAdded.getSize()
             );
 
             boolean added = addFileToFolder(rootFolder, folderName, newFile);

@@ -2,6 +2,7 @@ package br.com.joaojunio.cloudkeeper.service;
 
 import br.com.joaojunio.cloudkeeper.config.FolderStructurePathConfig;
 import br.com.joaojunio.cloudkeeper.data.dto.folderStructure.FolderStructureDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.json.FolderAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.ObjectToGenerateJsonDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.user.UserDTO;
 import br.com.joaojunio.cloudkeeper.model.FolderStructure;
@@ -56,7 +57,24 @@ public class FolderStructureService {
         }
         catch (Exception e) {
             e.printStackTrace();
-            throw new IllegalArgumentException();
+            throw new RuntimeException();
+        }
+    }
+
+    public FolderAddedToTheStructureDTO createFolderInStructure(FolderAddedToTheStructureDTO folderAdded) {
+        logger.info("Creating new Folder in structure");
+
+        try {
+            if (folderAdded.getNewFolderName().equalsIgnoreCase("")) {
+                throw new IllegalArgumentException("Error: New folder name is empty!");
+            }
+
+            jsonStorageService.addFolder(folderAdded);
+            return folderAdded;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 }
