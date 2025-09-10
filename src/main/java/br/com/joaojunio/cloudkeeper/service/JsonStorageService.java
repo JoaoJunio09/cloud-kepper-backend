@@ -1,5 +1,6 @@
 package br.com.joaojunio.cloudkeeper.service;
 
+import br.com.joaojunio.cloudkeeper.data.dto.file.MoveFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.*;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.UserStructure;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FileNode;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Iterator;
@@ -221,4 +223,59 @@ public class JsonStorageService {
         return false;
     }
 
+    public MoveFileResponseDTO moveFile(Long userId, String fileId, String nameFolder) throws IOException {
+        logger.info("Moving a file to another folder");
+
+        try {
+            File file = new File(folderStructurePath + "/user_" + userId + ".json");
+
+            UserStructure structure = objectMapper.readValue(file, UserStructure.class);
+
+            FolderNode rootFolder = objectMapper.convertValue(
+                    structure.getStructure().get("root"),
+                    FolderNode.class
+            );
+
+            FileNode fileNode = getFileNode(rootFolder, fileId);
+
+            boolean removed = removeFile(new FileRemovedFromStructure(userId, fileId));
+
+            if (removed) {
+                addFile(new FileAddedToTheStructureDTO(
+                    fileId,
+                    userId,
+                    fileNode.getFileType(),
+                    fileNode.getName(),
+                    fileNode.getSize()
+                ), nameFolder);
+            }
+
+            return new MoveFileResponseDTO(
+                fileNode.getName(),
+                fileNode.getFileId(),
+                null,
+                null
+            );
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
+    public FileNode getFileNode(FolderNode currentNode, String fileId) {
+        Iterator<Node> iterator = currentNode.getChildren().iterator();
+        FileNode file = new FileNode();
+
+        while (iterator.hasNext()) {
+            Node child = iterator.next();
+            if (child instanceof FolderNode childNode) {
+                file = getFileNode(childNode, fileId);
+            }
+            if (child instanceof FileNode childNode && childNode.getFileId().equalsIgnoreCase(fileId)) {
+                file = childNode;
+            }
+        }
+        return file;
+    }
 }

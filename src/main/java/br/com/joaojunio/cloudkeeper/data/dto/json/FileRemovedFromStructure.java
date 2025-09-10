@@ -3,7 +3,6 @@ package br.com.joaojunio.cloudkeeper.data.dto.json;
 public class FileRemovedFromStructure {
 
     private Long userId;
-    private String fileName;
     private String fileId;
 
     public FileRemovedFromStructure(Long userId, String fileId) {
@@ -17,14 +16,6 @@ public class FileRemovedFromStructure {
 
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 
     public String getFileId() {

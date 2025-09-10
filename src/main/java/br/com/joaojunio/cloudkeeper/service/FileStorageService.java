@@ -1,6 +1,7 @@
 package br.com.joaojunio.cloudkeeper.service;
 
 import br.com.joaojunio.cloudkeeper.data.dto.file.DeleteFileResponseDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.file.MoveFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FileAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FileRemovedFromStructure;
@@ -113,6 +114,23 @@ public class FileStorageService {
         }
         catch (Exception e) {
             throw new FileStorageException("Sorry! Error in deleting one file");
+        }
+    }
+
+    public MoveFileResponseDTO moveFile(Long userId, String fileId, String folderName) {
+        try {
+            if (fileId.equalsIgnoreCase("") ||
+                folderName.equalsIgnoreCase("") ||
+                userId.equals("") || userId == null
+            ) {
+                throw new IllegalArgumentException("Parameters cannot be empty or null");
+            }
+
+            jsonStorageService.moveFile(userId, fileId, folderName);
+            return new MoveFileResponseDTO();
+        }
+        catch (Exception e) {
+            throw new FileStorageException("Sorry! Error in moving file to another folder");
         }
     }
 
