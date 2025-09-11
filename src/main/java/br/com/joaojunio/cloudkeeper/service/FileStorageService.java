@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -92,11 +93,11 @@ public class FileStorageService {
                 logger.info("File Id is empty or null!");
             }
 
-            boolean fileRemovingForFolderStructure = jsonStorageService.removeFile(
+            Map<String, Object> fileRemovingForFolderStructure = jsonStorageService.removeFile(
                 new FileRemovedFromStructure(userId, fileId)
             );
 
-            B2FileVersion fileVersion = fileRemovingForFolderStructure
+            B2FileVersion fileVersion = fileRemovingForFolderStructure.get("removed").equals(true)
                 ? cloudFileService.deleteFile(fileId)
                 : null;
 

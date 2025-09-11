@@ -169,7 +169,7 @@ public class JsonStorageService {
         return false;
     }
 
-    public boolean removeFile(FileRemovedFromStructure fileRemoved) {
+    public Map<String, Object> removeFile(FileRemovedFromStructure fileRemoved) {
         logger.info("Deleting one File in folder structure");
 
         try {
@@ -182,8 +182,8 @@ public class JsonStorageService {
                 FolderNode.class
             );
 
-            boolean remove = removeToFile(rootFolder, fileRemoved.getFileId());
-            if (!remove) {
+            Map<String, Object> objectRemoved = removeToFile(rootFolder, fileRemoved.getFileId());
+            if (!objectRemoved.get("removed").equals(true)) {
                 logger.error("File to be deleted not found");
                 throw new RuntimeException("File to be deleted not found");
             }
@@ -193,7 +193,7 @@ public class JsonStorageService {
             objectMapper.writeValue(file, userStructure);
 
             logger.info("Successfully remove file in JSON!");
-            return true;
+            return objectRemoved;
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -201,7 +201,7 @@ public class JsonStorageService {
         }
     }
 
-    private boolean removeToFile(FolderNode currentFolder, String fileId) {
+    private Map<String, Object> removeToFile(FolderNode currentFolder, String fileId) {
         Iterator<Node> iterator = currentFolder.getChildren().iterator();
 
         while (iterator.hasNext()) {
@@ -210,21 +210,30 @@ public class JsonStorageService {
             if (child instanceof FileNode fileNode) {
                 if (fileNode.getFileId().equals(fileId)) {
                     iterator.remove();
-                    return true;
+                    return Map.of(
+                        "oldFolder", "root",
+                        "removed", true
+                    );
                 }
             }
             else if (child instanceof FolderNode folderNode) {
-                boolean removed = removeToFile(folderNode, fileId);
-                if (removed) {
-                    return true;
+                Map<String, Object> objectRemoved = removeToFile(folderNode, fileId);
+                if (objectRemoved.get("removed").equals(true)) {
+                    return Map.of(
+                        "oldFolder", child.getName(),
+                        "removed", true
+                    );
                 }
             }
         }
-        return false;
+        return Map.of(
+            "oldFolder", null,
+            "removed", false
+        );
     }
 
     public MoveFileResponseDTO moveFile(Long userId, String fileId, String nameFolder) throws IOException {
-        logger.info("Moving a file to another folder");
+        logger.info("Manipulating json to change file from one folder to another");
 
         try {
             File file = new File(folderStructurePath + "/user_" + userId + ".json");
@@ -232,15 +241,15 @@ public class JsonStorageService {
             UserStructure structure = objectMapper.readValue(file, UserStructure.class);
 
             FolderNode rootFolder = objectMapper.convertValue(
-                    structure.getStructure().get("root"),
-                    FolderNode.class
+                structure.getStructure().get("root"),
+                FolderNode.class
             );
 
             FileNode fileNode = getFileNode(rootFolder, fileId);
 
-            boolean removed = removeFile(new FileRemovedFromStructure(userId, fileId));
+            Map<String, Object> objectRemoved = removeFile(new FileRemovedFromStructure(userId, fileId));
 
-            if (removed) {
+            if (objectRemoved.get("removed").equals(true)) {
                 addFile(new FileAddedToTheStructureDTO(
                     fileId,
                     userId,
@@ -253,8 +262,8 @@ public class JsonStorageService {
             return new MoveFileResponseDTO(
                 fileNode.getName(),
                 fileNode.getFileId(),
-                null,
-                null
+                (String) objectRemoved.get("olfFolder"),
+                nameFolder
             );
         }
         catch (Exception e) {
