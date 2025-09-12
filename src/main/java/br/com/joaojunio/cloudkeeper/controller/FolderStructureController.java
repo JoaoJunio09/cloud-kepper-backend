@@ -1,6 +1,5 @@
 package br.com.joaojunio.cloudkeeper.controller;
 
-import br.com.joaojunio.cloudkeeper.data.dto.file.MoveFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.folderStructure.FolderStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FolderAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.service.FolderStructureService;
@@ -47,21 +46,5 @@ public class FolderStructureController {
                 new FolderAddedToTheStructureDTO(userId, newFolderName, folderName)
             )
         );
-    }
-
-    @GetMapping(
-        value = "/{userId}/{fileId}/{nameFolder}",
-        produces = {
-            MediaType.APPLICATION_JSON_VALUE,
-            MediaType.APPLICATION_XML_VALUE,
-            MediaType.APPLICATION_YAML_VALUE
-        }
-    )
-    public ResponseEntity<MoveFileResponseDTO> moveFileToOtherFolder(
-        @PathVariable("userId") Long userId,
-        @PathVariable("fileId") String fileId,
-        @PathVariable("nameFolder") String nameFolder
-    ) {
-        return ResponseEntity.ok().body(service.moveFile(userId, fileId, nameFolder));
     }
 }

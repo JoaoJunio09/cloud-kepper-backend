@@ -127,10 +127,10 @@ public class FileStorageService {
                 throw new IllegalArgumentException("Parameters cannot be empty or null");
             }
 
-            jsonStorageService.moveFile(userId, fileId, folderName);
-            return new MoveFileResponseDTO();
+            return jsonStorageService.moveFile(userId, fileId, folderName);
         }
         catch (Exception e) {
+            e.printStackTrace();
             throw new FileStorageException("Sorry! Error in moving file to another folder");
         }
     }

@@ -78,20 +78,4 @@ public class FolderStructureService {
             throw new RuntimeException();
         }
     }
-
-    public MoveFileResponseDTO moveFile(Long userId, String fileId, String folderName) {
-        logger.info("Moving a file to another folder");
-
-        try {
-            if (userId == null || fileId == null || folderName == null) {
-                throw new IllegalArgumentException("Error: New folder name is empty!");
-            }
-
-            return jsonStorageService.moveFile(userId, fileId, folderName);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
-    }
 }

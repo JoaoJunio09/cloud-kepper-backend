@@ -15,9 +15,6 @@ public class File {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "storageLocation", nullable = false)
-    private String storageLocation;
-
     @Column(name = "type", nullable = false)
     private String type;
 
@@ -44,14 +41,6 @@ public class File {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getStorageLocation() {
-        return storageLocation;
-    }
-
-    public void setStorageLocation(String storageLocation) {
-        this.storageLocation = storageLocation;
     }
 
     public String getType() {
@@ -82,11 +71,11 @@ public class File {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         File file = (File) o;
-        return Objects.equals(getId(), file.getId()) && Objects.equals(getName(), file.getName()) && Objects.equals(getStorageLocation(), file.getStorageLocation()) && Objects.equals(getType(), file.getType()) && Objects.equals(getSize(), file.getSize()) && Objects.equals(getUser(), file.getUser());
+        return Objects.equals(getId(), file.getId()) && Objects.equals(getName(), file.getName()) && Objects.equals(getType(), file.getType()) && Objects.equals(getSize(), file.getSize()) && Objects.equals(getUser(), file.getUser());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getStorageLocation(), getType(), getSize(), getUser());
+        return Objects.hash(getId(), getName(), getType(), getSize(), getUser());
     }
 }

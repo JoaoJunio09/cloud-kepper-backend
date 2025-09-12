@@ -247,6 +247,15 @@ public class JsonStorageService {
 
             FileNode fileNode = getFileNode(rootFolder, fileId);
 
+            if (fileNode.getFileType() == null || fileNode.getSize() == null || fileNode.getName() == null) {
+                logger.error("File type, size and name for file is null.");
+                fileNode = getFileNode(rootFolder, fileId);
+            }
+
+            if (fileNode.getFileType() == null || fileNode.getSize() == null || fileNode.getName() == null) {
+                throw new Exception("Critical error: unable to move file to another folder");
+            }
+
             Map<String, Object> objectRemoved = removeFile(new FileRemovedFromStructure(userId, fileId));
 
             if (objectRemoved.get("removed").equals(true)) {
@@ -274,17 +283,16 @@ public class JsonStorageService {
 
     public FileNode getFileNode(FolderNode currentNode, String fileId) {
         Iterator<Node> iterator = currentNode.getChildren().iterator();
-        FileNode file = new FileNode();
 
         while (iterator.hasNext()) {
             Node child = iterator.next();
             if (child instanceof FolderNode childNode) {
-                file = getFileNode(childNode, fileId);
+                return getFileNode(childNode, fileId);
             }
             if (child instanceof FileNode childNode && childNode.getFileId().equalsIgnoreCase(fileId)) {
-                file = childNode;
+                return childNode;
             }
         }
-        return file;
+        return null;
     }
 }

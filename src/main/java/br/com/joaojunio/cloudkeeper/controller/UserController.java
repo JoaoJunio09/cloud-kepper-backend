@@ -2,7 +2,6 @@ package br.com.joaojunio.cloudkeeper.controller;
 
 import br.com.joaojunio.cloudkeeper.controller.docs.UserControllerDocs;
 import br.com.joaojunio.cloudkeeper.data.dto.user.UserDTO;
-import br.com.joaojunio.cloudkeeper.service.FolderStructureService;
 import br.com.joaojunio.cloudkeeper.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

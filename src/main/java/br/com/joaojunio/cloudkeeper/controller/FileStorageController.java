@@ -2,10 +2,14 @@ package br.com.joaojunio.cloudkeeper.controller;
 
 import br.com.joaojunio.cloudkeeper.controller.docs.FileStorageControllerDocs;
 import br.com.joaojunio.cloudkeeper.data.dto.file.DeleteFileResponseDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.file.FileCreateRequestDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.file.MoveFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.service.CloudFileStorageService;
+import br.com.joaojunio.cloudkeeper.service.FileService;
 import br.com.joaojunio.cloudkeeper.service.FileStorageService;
 import br.com.joaojunio.cloudkeeper.service.FolderStructureService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.URLConnection;
 @RestController
 @RequestMapping(value = "api/file/v1")
-@Tag(name = "File Endpoint")
+@Tag(name = "File", description = "File end points")
 public class FileStorageController implements FileStorageControllerDocs {
 
     private final Logger logger = LoggerFactory.getLogger(FileStorageController.class.getName());
@@ -29,10 +33,8 @@ public class FileStorageController implements FileStorageControllerDocs {
     private FileStorageService service;
 
     @Autowired
-    private CloudFileStorageService cloudFileStorageService;
+    private FileService fileService;
 
-    @Autowired
-    private FolderStructureService folderStructureService;
 
     @PostMapping(value = "/uploadFile/{id}")
     @Override
@@ -41,7 +43,17 @@ public class FileStorageController implements FileStorageControllerDocs {
         @RequestParam("file") MultipartFile file,
         @RequestParam("folderName") String folderName
     ) {
-        return ResponseEntity.ok().body(service.upload(file, id, folderName));
+        var uploaded = service.upload(file, id, folderName);
+
+        fileService.create(new FileCreateRequestDTO(
+            null,
+            uploaded.getFileName(),
+            uploaded.getType(),
+            uploaded.getSize(),
+            id
+        ));
+
+        return ResponseEntity.ok().body(uploaded);
     }
 
     @GetMapping(value = "/{type}/{fileId}")
@@ -74,6 +86,22 @@ public class FileStorageController implements FileStorageControllerDocs {
                 dispositon + "; filename=\"" + fileName + "\""
             )
             .body(resource);
+    }
+
+    @GetMapping(
+        value = "/{userId}/{fileId}/{nameFolder}",
+        produces = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_XML_VALUE,
+            MediaType.APPLICATION_YAML_VALUE
+        }
+    )
+    public ResponseEntity<MoveFileResponseDTO> moveFileToOtherFolder(
+        @PathVariable("userId") Long userId,
+        @PathVariable("fileId") String fileId,
+        @PathVariable("nameFolder") String nameFolder
+    ) {
+        return ResponseEntity.ok().body(service.moveFile(userId, fileId, nameFolder));
     }
 
     @DeleteMapping(value = "/{userId}/{fileId}")

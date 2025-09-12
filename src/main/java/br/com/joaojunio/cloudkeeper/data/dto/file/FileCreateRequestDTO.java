@@ -5,12 +5,19 @@ public class FileCreateRequestDTO {
 
     private Long id;
     private String name;
-    private String storageLocation;
     private String type;
     private Long size;
     private Long userId;
 
     public FileCreateRequestDTO() {}
+
+    public FileCreateRequestDTO(Long id, String name, String type, Long size, Long userId) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.size = size;
+        this.userId = userId;
+    }
 
     public Long getId() {
         return id;
@@ -26,14 +33,6 @@ public class FileCreateRequestDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getStorageLocation() {
-        return storageLocation;
-    }
-
-    public void setStorageLocation(String storageLocation) {
-        this.storageLocation = storageLocation;
     }
 
     public String getType() {
@@ -64,11 +63,11 @@ public class FileCreateRequestDTO {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         FileCreateRequestDTO that = (FileCreateRequestDTO) o;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getStorageLocation(), that.getStorageLocation()) && Objects.equals(getType(), that.getType()) && Objects.equals(getSize(), that.getSize()) && Objects.equals(getUserId(), that.getUserId());
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getType(), that.getType()) && Objects.equals(getSize(), that.getSize()) && Objects.equals(getUserId(), that.getUserId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getStorageLocation(), getType(), getSize(), getUserId());
+        return Objects.hash(getId(), getName(), getType(), getSize(), getUserId());
     }
 }
