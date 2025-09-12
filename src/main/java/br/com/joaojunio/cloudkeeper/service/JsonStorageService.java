@@ -227,7 +227,7 @@ public class JsonStorageService {
             }
         }
         return Map.of(
-            "oldFolder", null,
+            "oldFolder", "",
             "removed", false
         );
     }
@@ -262,7 +262,7 @@ public class JsonStorageService {
             return new MoveFileResponseDTO(
                 fileNode.getName(),
                 fileNode.getFileId(),
-                (String) objectRemoved.get("olfFolder"),
+                (String) objectRemoved.get("oldFolder"),
                 nameFolder
             );
         }
