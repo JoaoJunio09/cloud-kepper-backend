@@ -4,10 +4,13 @@ import br.com.joaojunio.cloudkeeper.data.dto.folderStructure.FolderStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FolderAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.service.FolderStructureService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -26,6 +29,29 @@ public class FolderStructureController {
     )
     public ResponseEntity<List<FolderStructureDTO>> findAll() {
         return ResponseEntity.ok().body(service.findAll());
+    }
+
+    @GetMapping(
+        value = "/{userId}",
+        produces = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.APPLICATION_XML_VALUE,
+            MediaType.APPLICATION_YAML_VALUE
+        }
+    )
+    public ResponseEntity<?> getFolderStructure(@PathVariable("userId") Long userId) {
+        try {
+            String filePath = "C:/Temp/cloudkeeper/folder_structure/user_" + userId + ".json";
+            String json = new String(Files.readAllBytes(Paths.get(filePath)));
+
+            return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(json);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body("File not found for user id: " + userId);
+        }
     }
 
     @GetMapping(

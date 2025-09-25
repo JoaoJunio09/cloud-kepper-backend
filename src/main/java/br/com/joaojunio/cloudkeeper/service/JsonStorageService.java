@@ -282,17 +282,19 @@ public class JsonStorageService {
     }
 
     public FileNode getFileNode(FolderNode currentNode, String fileId) {
-        Iterator<Node> iterator = currentNode.getChildren().iterator();
-
-        while (iterator.hasNext()) {
-            Node child = iterator.next();
-            if (child instanceof FolderNode childNode) {
-                return getFileNode(childNode, fileId);
-            }
-            if (child instanceof FileNode childNode && childNode.getFileId().equalsIgnoreCase(fileId)) {
-                return childNode;
+        for (Node child : currentNode.getChildren()) {
+            if (child instanceof FileNode fileNode) {
+                if (fileNode.getFileId().equalsIgnoreCase(fileId)) {
+                    return fileNode;
+                }
+            } else if (child instanceof FolderNode folderNode) {
+                FileNode found = getFileNode(folderNode, fileId);
+                if (found != null) {
+                    return found;
+                }
             }
         }
         return null;
     }
+
 }
