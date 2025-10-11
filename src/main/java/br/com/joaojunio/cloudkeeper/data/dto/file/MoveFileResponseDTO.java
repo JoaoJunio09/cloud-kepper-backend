@@ -5,15 +5,13 @@ public class MoveFileResponseDTO {
     private String fileName;
     private String fileId;
     private String oldFolder;
-    private String currentFolder;
+    private String nameFolder;
 
-    public MoveFileResponseDTO() {}
+    public MoveFileResponseDTO(String name, String fileId, String oldFolder, String nameFolder) {}
 
-    public MoveFileResponseDTO(String fileName, String fileId, String oldFolder, String currentFolder) {
+    public MoveFileResponseDTO(String fileName, String fileId) {
         this.fileName = fileName;
         this.fileId = fileId;
-        this.oldFolder = oldFolder;
-        this.currentFolder = currentFolder;
     }
 
     public String getFileName() {
@@ -40,11 +38,11 @@ public class MoveFileResponseDTO {
         this.oldFolder = oldFolder;
     }
 
-    public String getCurrentFolder() {
-        return currentFolder;
+    public String getNameFolder() {
+        return nameFolder;
     }
 
-    public void setCurrentFolder(String currentFolder) {
-        this.currentFolder = currentFolder;
+    public void setNameFolder(String nameFolder) {
+        this.nameFolder = nameFolder;
     }
 }

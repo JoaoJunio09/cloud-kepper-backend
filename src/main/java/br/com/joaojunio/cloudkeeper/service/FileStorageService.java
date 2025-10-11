@@ -3,6 +3,8 @@ package br.com.joaojunio.cloudkeeper.service;
 import br.com.joaojunio.cloudkeeper.data.dto.file.DeleteFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.file.MoveFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.file.UploadFileResponseDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.folder.MoveFolderRequestDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.folder.MoveFolderResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FileAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FileRemovedFromStructure;
 import br.com.joaojunio.cloudkeeper.exceptions.FileStorageException;
@@ -35,7 +37,7 @@ public class FileStorageService {
     @Autowired
     private JsonStorageService jsonStorageService;
 
-    public UploadFileResponseDTO upload(MultipartFile file, Long userId, String folderName) {
+    public UploadFileResponseDTO upload(MultipartFile file, Long userId, String folderName, Long folderId) {
         logger.info("Uploading Files");
 
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
@@ -51,7 +53,7 @@ public class FileStorageService {
                     file.getContentType(),
                     fileName,
                     file.getSize()
-                ), folderName
+                ), folderName, folderId
             );
 
             UploadFileResponseDTO responseDTO = new UploadFileResponseDTO();
@@ -118,7 +120,7 @@ public class FileStorageService {
         }
     }
 
-    public MoveFileResponseDTO moveFile(Long userId, String fileId, String folderName) {
+    public MoveFileResponseDTO moveFile(Long userId, String fileId, String folderName, Long folderId) {
         try {
             if (fileId.equalsIgnoreCase("") ||
                 folderName.equalsIgnoreCase("") ||
@@ -127,7 +129,18 @@ public class FileStorageService {
                 throw new IllegalArgumentException("Parameters cannot be empty or null");
             }
 
-            return jsonStorageService.moveFile(userId, fileId, folderName);
+            return jsonStorageService.moveFile(userId, fileId, folderName, folderId);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new FileStorageException("Sorry! Error in moving file to another folder");
+        }
+    }
+
+    public MoveFolderResponseDTO moveFolder(MoveFolderRequestDTO moveFolder) {
+        try {
+
+            return null;
         }
         catch (Exception e) {
             e.printStackTrace();

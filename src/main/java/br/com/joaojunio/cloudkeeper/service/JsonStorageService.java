@@ -1,6 +1,8 @@
 package br.com.joaojunio.cloudkeeper.service;
 
 import br.com.joaojunio.cloudkeeper.data.dto.file.MoveFileResponseDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.folder.MoveFolderRequestDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.folder.MoveFolderResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.*;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.UserStructure;
 import br.com.joaojunio.cloudkeeper.model.folderStructure.node.FileNode;
@@ -84,7 +86,7 @@ public class JsonStorageService {
 
             FolderNode newFolder = new FolderNode(folderAdded.getNewFolderName());
 
-            boolean added = addFolderToStructure(rootFolder, folderAdded.getFolderName(), newFolder);
+            boolean added = addFolderToStructure(rootFolder, folderAdded.getFolderName(), newFolder, folderAdded.getFolderId());
             if (!added) {
                 throw new RuntimeException("Folder '" + folderAdded.getFolderName() + "' not found!");
             }
@@ -100,15 +102,15 @@ public class JsonStorageService {
         }
     }
 
-    private boolean addFolderToStructure(FolderNode currentNode, String folderName, FolderNode newFolder) {
-        if (currentNode.getName().trim().equalsIgnoreCase(folderName)) {
+    private boolean addFolderToStructure(FolderNode currentNode, String folderName, FolderNode newFolder, Long folderId) {
+        if (currentNode.getName().trim().equalsIgnoreCase(folderName) && currentNode.getId().equals(String.valueOf(folderId))) {
             currentNode.getChildren().add(newFolder);
             return true;
         }
 
         for (Object child : currentNode.getChildren()) {
-            if (child instanceof FolderNode folderChild && folderChild.getName().equalsIgnoreCase(folderName)) {
-                boolean added = addFolderToStructure(folderChild, folderName, newFolder);
+            if (child instanceof FolderNode folderChild) {
+                boolean added = addFolderToStructure(folderChild, folderName, newFolder, folderId);
                 if (added) return true;
             }
         }
@@ -116,9 +118,7 @@ public class JsonStorageService {
         return false;
     }
 
-    // vou adicionar o arquivo dentro da pasta (percorro o json e procuro ela)
-    // se a pasta nao existir, o arquivo sera adicionado na pasta raiz
-    public void addFile(FileAddedToTheStructureDTO fileAdded, String folderName) {
+    public void addFile(FileAddedToTheStructureDTO fileAdded, String folderName, Long folderId) {
         logger.info("Creating a new File in folder structure");
 
         try {
@@ -135,7 +135,7 @@ public class JsonStorageService {
                 fileAdded.getFileId(), fileAdded.getName(), fileAdded.getType(), fileAdded.getSize()
             );
 
-            boolean added = addFileToFolder(rootFolder, folderName, newFile);
+            boolean added = addFileToFolder(rootFolder, folderName, newFile, folderId);
             if (!added) {
                 throw new RuntimeException("Folder '" + folderName + "' not found!");
             }
@@ -151,15 +151,15 @@ public class JsonStorageService {
         }
     }
 
-    private boolean addFileToFolder(FolderNode currentFolder, String folderName, FileNode newFile) {
-        if (currentFolder.getName().trim().equalsIgnoreCase(folderName)) {
+    private boolean addFileToFolder(FolderNode currentFolder, String folderName, FileNode newFile, Long folderId) {
+        if (currentFolder.getName().trim().equalsIgnoreCase(folderName) && currentFolder.getId().equals(String.valueOf(folderId))) {
             currentFolder.addChild(newFile);
             return true;
         }
 
         for (Object child : currentFolder.getChildren()) {
             if (child instanceof FolderNode folderChild) {
-                boolean added = addFileToFolder(folderChild, folderName, newFile);
+                boolean added = addFileToFolder(folderChild, folderName, newFile, folderId);
                 if (added) {
                     return true;
                 }
@@ -232,7 +232,7 @@ public class JsonStorageService {
         );
     }
 
-    public MoveFileResponseDTO moveFile(Long userId, String fileId, String nameFolder) throws IOException {
+    public MoveFileResponseDTO moveFile(Long userId, String fileId, String nameFolder, Long folderId) throws IOException {
         logger.info("Manipulating json to change file from one folder to another");
 
         try {
@@ -265,7 +265,7 @@ public class JsonStorageService {
                     fileNode.getFileType(),
                     fileNode.getName(),
                     fileNode.getSize()
-                ), nameFolder);
+                ), nameFolder, folderId);
             }
 
             return new MoveFileResponseDTO(
@@ -297,4 +297,64 @@ public class JsonStorageService {
         return null;
     }
 
+    public MoveFolderResponseDTO moveFolder(MoveFolderRequestDTO moveFolder) {
+        try {
+            File file = new File(folderStructurePath + "/user_" + moveFolder.getUserId() + ".json");
+
+            UserStructure structure = objectMapper.readValue(file, UserStructure.class);
+            FolderNode root = objectMapper.convertValue(
+                structure.getStructure().get("root"),
+                FolderNode.class
+            );
+
+            FolderNode newFolder = new FolderNode(moveFolder.getNewFolderName());
+
+            boolean removedFolder = removeFolder(root, moveFolder.getFolderId());
+            if (!removedFolder) {
+                throw new Exception("Critical error: unable to remove folder");
+            }
+
+            var addedFolder = addFolder(root, moveFolder.getFolderId(), newFolder);
+            if (addedFolder == null) {
+                throw new Exception("Critical error: unable to added folder");
+            }
+
+            return new MoveFolderResponseDTO(addedFolder.getName(), addedFolder.getId());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
+    public FolderNode addFolder(FolderNode currentFolder, String folderId, FolderNode folderNode) {
+        if (currentFolder.getId().equals(String.valueOf(folderId))) {
+            currentFolder.addChild(folderNode);
+            return currentFolder;
+        }
+
+        for (Object child : currentFolder.getChildren()) {
+            if (child instanceof FolderNode folderChild) {
+                FolderNode found = addFolder(folderChild, folderId, folderNode);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    public boolean removeFolder(FolderNode currentFolder, String folderId) {
+        for (Node child : currentFolder.getChildren()) {
+            if (child instanceof FolderNode folderNode) {
+                if (folderNode.getId().equalsIgnoreCase(folderId)) {
+                    currentFolder.getChildren().remove(folderNode);
+                    return true;
+                }
+                else {
+                    boolean removed = removeFolder(folderNode, folderId);
+                    if (removed) return true;
+                }
+            }
+        }
+        return false;
+    }
 }

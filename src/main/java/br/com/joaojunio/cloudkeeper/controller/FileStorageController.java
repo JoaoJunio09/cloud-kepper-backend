@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URLConnection;
+import java.nio.file.Path;
+
 @RestController
 @RequestMapping(value = "api/file/v1")
 @Tag(name = "File", description = "File end points")
@@ -36,14 +38,15 @@ public class FileStorageController implements FileStorageControllerDocs {
     private FileService fileService;
 
 
-    @PostMapping(value = "/uploadFile/{id}")
+    @PostMapping(value = "/uploadFile/{id}/{folderId}")
     @Override
     public ResponseEntity<UploadFileResponseDTO> uploadFile(
         @PathVariable("id") Long id,
         @RequestParam("file") MultipartFile file,
-        @RequestParam("folderName") String folderName
+        @RequestParam("folderName") String folderName,
+        @PathVariable("folderId") Long folderId
     ) {
-        var uploaded = service.upload(file, id, folderName);
+        var uploaded = service.upload(file, id, folderName, folderId);
 
         fileService.create(new FileCreateRequestDTO(
             null,
@@ -89,7 +92,7 @@ public class FileStorageController implements FileStorageControllerDocs {
     }
 
     @GetMapping(
-        value = "/{userId}/{fileId}/{nameFolder}",
+        value = "/{userId}/{fileId}/{nameFolder}/{folderId}",
         produces = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE,
@@ -99,9 +102,10 @@ public class FileStorageController implements FileStorageControllerDocs {
     public ResponseEntity<MoveFileResponseDTO> moveFileToOtherFolder(
         @PathVariable("userId") Long userId,
         @PathVariable("fileId") String fileId,
-        @PathVariable("nameFolder") String nameFolder
+        @PathVariable("nameFolder") String nameFolder,
+        @PathVariable("folderId") Long folderId
     ) {
-        return ResponseEntity.ok().body(service.moveFile(userId, fileId, nameFolder));
+        return ResponseEntity.ok().body(service.moveFile(userId, fileId, nameFolder, folderId));
     }
 
     @DeleteMapping(value = "/{userId}/{fileId}")

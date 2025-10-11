@@ -2,6 +2,8 @@ package br.com.joaojunio.cloudkeeper.service;
 
 import br.com.joaojunio.cloudkeeper.config.FolderStructurePathConfig;
 import br.com.joaojunio.cloudkeeper.data.dto.file.MoveFileResponseDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.folder.MoveFolderRequestDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.folder.MoveFolderResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.folderStructure.FolderStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FolderAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.ObjectToGenerateJsonDTO;
@@ -72,6 +74,22 @@ public class FolderStructureService {
 
             jsonStorageService.addFolder(folderAdded);
             return folderAdded;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
+    public MoveFolderResponseDTO moveFolder(MoveFolderRequestDTO moveFolder) {
+        logger.info("Moving a folder a other folder");
+
+        try {
+            if (moveFolder == null) {
+                throw new IllegalArgumentException("Error: object for folder is empty!");
+            }
+
+            return jsonStorageService.moveFolder(moveFolder);
         }
         catch (Exception e) {
             e.printStackTrace();

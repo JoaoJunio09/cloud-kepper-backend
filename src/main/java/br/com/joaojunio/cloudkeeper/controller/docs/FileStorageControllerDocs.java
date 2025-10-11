@@ -31,7 +31,7 @@ public interface FileStorageControllerDocs {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content),
         }
     )
-    ResponseEntity<UploadFileResponseDTO> uploadFile(Long id, MultipartFile file, String folderName);
+    ResponseEntity<UploadFileResponseDTO> uploadFile(Long id, MultipartFile file, String folderName, Long folderId);
 
     @Operation(
         tags = {"File"},
@@ -89,7 +89,7 @@ public interface FileStorageControllerDocs {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content),
         }
     )
-    ResponseEntity<MoveFileResponseDTO> moveFileToOtherFolder(Long userId, String fileId, String nameFolder);
+    ResponseEntity<MoveFileResponseDTO> moveFileToOtherFolder(Long userId, String fileId, String nameFolder, Long folderId);
 
     @Operation(
         tags = {"File"},

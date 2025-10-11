@@ -5,13 +5,15 @@ public class FolderAddedToTheStructureDTO {
     private Long userId;
     private String newFolderName;
     private String folderName;
+    private Long folderId;
 
     public FolderAddedToTheStructureDTO() {}
 
-    public FolderAddedToTheStructureDTO(Long userId, String newFolderName, String folderName) {
+    public FolderAddedToTheStructureDTO(Long userId, String newFolderName, String folderName, Long folderId) {
         this.userId = userId;
         this.newFolderName = newFolderName;
         this.folderName = folderName;
+        this.folderId = folderId;
     }
 
     public Long getUserId() {
@@ -36,5 +38,13 @@ public class FolderAddedToTheStructureDTO {
 
     public void setFolderName(String folderName) {
         this.folderName = folderName;
+    }
+
+    public Long getFolderId() {
+        return folderId;
+    }
+
+    public void setFolderId(Long folderId) {
+        this.folderId = folderId;
     }
 }
