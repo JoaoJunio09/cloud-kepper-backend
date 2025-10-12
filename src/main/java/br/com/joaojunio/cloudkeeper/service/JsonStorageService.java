@@ -302,24 +302,27 @@ public class JsonStorageService {
             File file = new File(folderStructurePath + "/user_" + moveFolder.getUserId() + ".json");
 
             UserStructure structure = objectMapper.readValue(file, UserStructure.class);
+
             FolderNode root = objectMapper.convertValue(
                 structure.getStructure().get("root"),
                 FolderNode.class
             );
 
-            FolderNode newFolder = new FolderNode(moveFolder.getNewFolderName());
+            FolderNode folderNode = getFolder(root, moveFolder.getFolderId());
 
-            boolean removedFolder = removeFolder(root, moveFolder.getFolderId());
+            boolean removedFolder = removeFolder(moveFolder.getUserId(), root, moveFolder.getFolderId(), folderNode);
+
             if (!removedFolder) {
-                throw new Exception("Critical error: unable to remove folder");
+                throw new Exception("Critical error: unable to remove folder to another folder");
             }
 
-            var addedFolder = addFolder(root, moveFolder.getFolderId(), newFolder);
+            var addedFolder = addFolder(moveFolder.getUserId(), root, moveFolder.getCurrentFolderId(), folderNode);
+
             if (addedFolder == null) {
-                throw new Exception("Critical error: unable to added folder");
+                throw new Exception("Critical error: unable to add folder to another folder");
             }
 
-            return new MoveFolderResponseDTO(addedFolder.getName(), addedFolder.getId());
+            return new MoveFolderResponseDTO(folderNode.getName(), folderNode.getId());
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -327,34 +330,109 @@ public class JsonStorageService {
         }
     }
 
-    public FolderNode addFolder(FolderNode currentFolder, String folderId, FolderNode folderNode) {
+    public FolderNode addFolder(Long userId, FolderNode currentFolder, String folderId, FolderNode folderNode) {
+        try {
+            File file = new File(folderStructurePath + "/user_" + userId + ".json");
+
+            UserStructure userStructure = objectMapper.readValue(file, UserStructure.class);
+
+            FolderNode rootFolder = objectMapper.convertValue(
+                userStructure.getStructure().get("root"),
+                FolderNode.class
+            );
+
+            FolderNode addedFolder = addToFolder(rootFolder, folderId, folderNode);
+
+            userStructure.getStructure().put("root", objectMapper.convertValue(rootFolder, JsonNode.class));
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.writeValue(file, userStructure);
+
+            logger.info("Successfully added folder in JSON!");
+            return addedFolder;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public FolderNode addToFolder(FolderNode currentFolder, String folderId, FolderNode folderNode) {
         if (currentFolder.getId().equals(String.valueOf(folderId))) {
             currentFolder.addChild(folderNode);
             return currentFolder;
         }
 
-        for (Object child : currentFolder.getChildren()) {
+        for (Node child : currentFolder.getChildren()) {
             if (child instanceof FolderNode folderChild) {
-                FolderNode found = addFolder(folderChild, folderId, folderNode);
+                FolderNode found = addToFolder(folderChild, folderId, folderNode);
                 if (found != null) return found;
             }
         }
         return null;
     }
 
-    public boolean removeFolder(FolderNode currentFolder, String folderId) {
-        for (Node child : currentFolder.getChildren()) {
+    public boolean removeFolder(Long userId, FolderNode currentFolder, String folderId, FolderNode folderRemoved) {
+        try {
+            File file = new File(folderStructurePath + "/user_" + userId + ".json");
+
+            UserStructure userStructure = objectMapper.readValue(file, UserStructure.class);
+
+            FolderNode rootFolder = objectMapper.convertValue(
+                userStructure.getStructure().get("root"),
+                FolderNode.class
+            );
+
+            boolean removed = removeToFolder(rootFolder, folderId, folderRemoved);
+
+            userStructure.getStructure().put("root", objectMapper.convertValue(rootFolder, JsonNode.class));
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.writeValue(file, userStructure);
+
+            logger.info("Successfully remove folder in JSON!");
+            return removed;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean removeToFolder(FolderNode currentFolder, String folderId, FolderNode folderRemoved) {
+        Iterator<Node> iterator = currentFolder.getChildren().iterator();
+
+        while (iterator.hasNext()) {
+            Node child = iterator.next();
+
             if (child instanceof FolderNode folderNode) {
                 if (folderNode.getId().equalsIgnoreCase(folderId)) {
-                    currentFolder.getChildren().remove(folderNode);
+                    iterator.remove();
                     return true;
                 }
-                else {
-                    boolean removed = removeFolder(folderNode, folderId);
-                    if (removed) return true;
+
+                boolean removed = removeToFolder(folderNode, folderId, folderRemoved);
+                if (removed) return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    public FolderNode getFolder(FolderNode currentFolder, String folderId) {
+        if (currentFolder.getId().equalsIgnoreCase(folderId)) {
+            return currentFolder;
+        }
+
+        for (Node child : currentFolder.getChildren()) {
+            if (child instanceof FolderNode folderNode) {
+                FolderNode found = getFolder(folderNode, folderId);
+                if (found != null) {
+                    return found;
                 }
             }
         }
-        return false;
+
+        return null;
     }
+
 }

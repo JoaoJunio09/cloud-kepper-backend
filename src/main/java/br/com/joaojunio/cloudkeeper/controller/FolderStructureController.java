@@ -81,7 +81,7 @@ public class FolderStructureController {
     }
 
     @GetMapping(
-        value = "/{userId}/{folderName}/{folderId}/{newFolderName}",
+        value = "/moveFolder/{userId}/{folderId}/{currentFolderId}",
         produces = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE,
@@ -90,13 +90,12 @@ public class FolderStructureController {
     )
     public ResponseEntity<MoveFolderResponseDTO> moveFolder(
         @PathVariable("userId") Long userId,
-        @PathVariable("folderName") String folderName,
-        @PathVariable("folderId") String folderId,
-        @PathVariable("newFolderName") String newFolderName
+        @PathVariable("folderId") Long folderId,
+        @PathVariable("currentFolderId") Long currentFolderId
     ) {
         return ResponseEntity.ok().body(
             service.moveFolder(
-                new MoveFolderRequestDTO(userId, folderName, folderId, newFolderName)
+                new MoveFolderRequestDTO(userId, folderId, currentFolderId)
             )
         );
     }

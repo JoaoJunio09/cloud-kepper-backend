@@ -3,17 +3,15 @@ package br.com.joaojunio.cloudkeeper.data.dto.folder;
 public class MoveFolderRequestDTO {
 
     private Long userId;
-    private String folderName;
-    private String folderId;
-    private String newFolderName;
+    private String FolderId;
+    private String currentFolderId;
 
     public MoveFolderRequestDTO() {}
 
-    public MoveFolderRequestDTO(Long userId, String folderName, String folderId, String newFolderName) {
+    public MoveFolderRequestDTO(Long userId, Long folderId, Long currentFolderId) {
         this.userId = userId;
-        this.folderName = folderName;
-        this.folderId = folderId;
-        this.newFolderName = newFolderName;
+        this.FolderId = String.valueOf(folderId);
+        this.currentFolderId = String.valueOf(currentFolderId);
     }
 
     public Long getUserId() {
@@ -24,27 +22,19 @@ public class MoveFolderRequestDTO {
         this.userId = userId;
     }
 
-    public String getFolderName() {
-        return folderName;
-    }
-
-    public void setFolderName(String folderName) {
-        this.folderName = folderName;
-    }
-
     public String getFolderId() {
-        return folderId;
+        return FolderId;
     }
 
-    public void setFolderId(String folderId) {
-        this.folderId = folderId;
+    public void setFolderId(String FolderId) {
+        this.FolderId = FolderId;
     }
 
-    public String getNewFolderName() {
-        return newFolderName;
+    public String getCurrentFolderId() {
+        return currentFolderId;
     }
 
-    public void setNewFolderName(String newFolderName) {
-        this.newFolderName = newFolderName;
+    public void setCurrentFolderId(String currentFolderId) {
+        this.currentFolderId = currentFolderId;
     }
 }
