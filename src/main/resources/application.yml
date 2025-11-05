@@ -3,6 +3,11 @@ cors:
 file:
   uploadDir: C:/Temp/cloudkeeper/files
   folderStructure: C:/Temp/cloudkeeper/folder_structure
+security:
+  jwt:
+    token:
+      secret-key: 53cr37
+      expire-length: 3600000
 b2:
   keyId: 005df139ad1f5050000000001
   applicationKey: K005ET3/1hVihGGEI4Kk5JIROkJtnX8
