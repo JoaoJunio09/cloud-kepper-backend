@@ -1,12 +1,12 @@
 package br.com.joaojunio.cloudkeeper.data.dto.folderStructure;
 
-import br.com.joaojunio.cloudkeeper.data.dto.user.UserDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.person.PersonDTO;
 
 public class FolderStructureDTO {
 
     private Long id;
     private String folderStructurePath;
-    private UserDTO user;
+    private PersonDTO user;
 
     public FolderStructureDTO() {}
 
@@ -18,11 +18,11 @@ public class FolderStructureDTO {
         this.folderStructurePath = folderStructurePath;
     }
 
-    public UserDTO getUser() {
+    public PersonDTO getUser() {
         return user;
     }
 
-    public void setUser(UserDTO user) {
+    public void setUser(PersonDTO user) {
         this.user = user;
     }
 

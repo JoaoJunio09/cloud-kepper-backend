@@ -1,8 +1,8 @@
 package br.com.joaojunio.cloudkeeper.controller;
 
-import br.com.joaojunio.cloudkeeper.controller.docs.UserControllerDocs;
-import br.com.joaojunio.cloudkeeper.data.dto.user.UserDTO;
-import br.com.joaojunio.cloudkeeper.service.UserService;
+import br.com.joaojunio.cloudkeeper.controller.docs.PersonControllerDocs;
+import br.com.joaojunio.cloudkeeper.data.dto.person.PersonDTO;
+import br.com.joaojunio.cloudkeeper.service.PersonService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "api/user/v1")
-@Tag(name = "User", description = "Endpoints for User entity")
-public class UserController implements UserControllerDocs {
+@RequestMapping(value = "api/person/v1")
+@Tag(name = "Person", description = "Endpoints for Person entity")
+public class PersonController implements PersonControllerDocs {
 
     @Autowired
-    private UserService service;
+    private PersonService service;
 
     @GetMapping(
         produces = {
@@ -27,7 +27,7 @@ public class UserController implements UserControllerDocs {
         }
     )
     @Override
-    public ResponseEntity<List<UserDTO>> findAll() {
+    public ResponseEntity<List<PersonDTO>> findAll() {
         return ResponseEntity.ok().body(service.findAll());
     }
 
@@ -40,7 +40,7 @@ public class UserController implements UserControllerDocs {
         }
     )
     @Override
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<PersonDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(service.findById(id));
     }
 
@@ -57,7 +57,7 @@ public class UserController implements UserControllerDocs {
         }
     )
     @Override
-    public ResponseEntity<UserDTO> create(@RequestBody UserDTO user) {
+    public ResponseEntity<PersonDTO> create(@RequestBody PersonDTO user) {
         return ResponseEntity.ok().body(service.create(user));
     }
 
@@ -74,7 +74,7 @@ public class UserController implements UserControllerDocs {
         }
     )
     @Override
-    public ResponseEntity<UserDTO> update(@RequestBody UserDTO user) {
+    public ResponseEntity<PersonDTO> update(@RequestBody PersonDTO user) {
         return ResponseEntity.ok().body(service.update(user));
     }
 

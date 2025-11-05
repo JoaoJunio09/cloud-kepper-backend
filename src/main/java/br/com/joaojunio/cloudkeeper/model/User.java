@@ -1,72 +1,48 @@
 package br.com.joaojunio.cloudkeeper.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "user")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "firstName", nullable = false)
-    private String firstName;
-
-    @Column(name = "lastName", nullable = false)
-    private String lastName;
-
-    @Column(name = "email", nullable = false)
-    private String email;
-
-    @Column(name = "password", nullable = false)
+    private String username;
+    private String fullname;
     private String password;
-
-    @Column(name = "enabled", nullable = false)
+    private Boolean accountNonExpired;
+    private Boolean accountNonLocked;
+    private Boolean credentialsNonExpired;
     private Boolean enabled;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private FolderStructure folderStructure;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<File> files = new HashSet<>();
 
     public User() {}
 
-    public Long getId() {
-        return id;
+    public User(String username, String fullname, String password, Boolean accountNonExpired, Boolean accountNonLocked, Boolean credentialsNonExpired, Boolean enabled) {
+        this.username = username;
+        this.fullname = fullname;
+        this.password = password;
+        this.accountNonExpired = accountNonExpired;
+        this.accountNonLocked = accountNonLocked;
+        this.credentialsNonExpired = credentialsNonExpired;
+        this.enabled = enabled;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getUsername() {
+        return username;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public String getFullname() {
+        return fullname;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public String getPassword() {
@@ -77,31 +53,47 @@ public class User {
         this.password = password;
     }
 
+    public Boolean getAccountNonExpired() {
+        return accountNonExpired;
+    }
+
+    public void setAccountNonExpired(Boolean accountNonExpired) {
+        this.accountNonExpired = accountNonExpired;
+    }
+
+    public Boolean getAccountNonLocked() {
+        return accountNonLocked;
+    }
+
+    public void setAccountNonLocked(Boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
+    public Boolean getCredentialsNonExpired() {
+        return credentialsNonExpired;
+    }
+
+    public void setCredentialsNonExpired(Boolean credentialsNonExpired) {
+        this.credentialsNonExpired = credentialsNonExpired;
+    }
+
     public Boolean getEnabled() {
-        return this.enabled;
+        return enabled;
     }
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public Set<File> getFiles() {
-        return files;
-    }
-
-    public void setFiles(Set<File> files) {
-        this.files = files;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(getId(), user.getId()) && Objects.equals(getFirstName(), user.getFirstName()) && Objects.equals(getLastName(), user.getLastName());
+        return Objects.equals(getUsername(), user.getUsername()) && Objects.equals(getFullname(), user.getFullname()) && Objects.equals(getPassword(), user.getPassword()) && Objects.equals(getAccountNonExpired(), user.getAccountNonExpired()) && Objects.equals(getAccountNonLocked(), user.getAccountNonLocked()) && Objects.equals(getCredentialsNonExpired(), user.getCredentialsNonExpired()) && Objects.equals(getEnabled(), user.getEnabled());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getFirstName(), getLastName());
+        return Objects.hash(getUsername(), getFullname(), getPassword(), getAccountNonExpired(), getAccountNonLocked(), getCredentialsNonExpired(), getEnabled());
     }
 }

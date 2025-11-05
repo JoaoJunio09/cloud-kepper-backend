@@ -23,7 +23,7 @@ public class File {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private Person user;
 
     public File() {}
 
@@ -59,11 +59,11 @@ public class File {
         this.size = size;
     }
 
-    public User getUser() {
+    public Person getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(Person user) {
         this.user = user;
     }
 

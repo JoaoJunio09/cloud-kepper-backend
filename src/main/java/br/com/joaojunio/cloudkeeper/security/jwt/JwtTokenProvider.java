@@ -1,11 +1,14 @@
 package br.com.joaojunio.cloudkeeper.security.jwt;
 
 import br.com.joaojunio.cloudkeeper.data.dto.security.TokenDTO;
+import br.com.joaojunio.cloudkeeper.exceptions.InvalidJwtAuthenticationException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -87,4 +90,29 @@ public class JwtTokenProvider {
     }
 
 
+    public String resolveToken(HttpServletRequest servletRequest) {
+        String bearerToken = servletRequest.getHeader("Authorization");
+
+        if (refreshTokenContainsBearer(bearerToken)) return bearerToken.substring("Bearer ".length());
+        return null;
+    }
+
+    private boolean refreshTokenContainsBearer(String refreshToken) {
+        return StringUtils.isNotBlank(refreshToken) && refreshToken.contains("Bearer ");
+    }
+
+    public boolean validateToken(String token) {
+        DecodedJWT decodedJWT = decodedToken(token);
+        try {
+            if (decodedJWT.getExpiresAt().before(new Date())) {
+                return false;
+            }
+            else {
+                return true;
+            }
+         }
+        catch (Exception e) {
+            throw new InvalidJwtAuthenticationException("Expired or Invalid JWT Token!");
+        }
+    }
 }

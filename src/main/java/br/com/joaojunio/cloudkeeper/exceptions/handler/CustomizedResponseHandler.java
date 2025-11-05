@@ -59,4 +59,13 @@ public class CustomizedResponseHandler {
             new Date());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
+
+    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidAuthenticationException(InvalidJwtAuthenticationException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+            ex.getMessage(),
+            request.getDescription(false),
+            new Date());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.FORBIDDEN);
+    }
 }

@@ -1,15 +1,14 @@
 package br.com.joaojunio.cloudkeeper.service;
 
 import br.com.joaojunio.cloudkeeper.config.FolderStructurePathConfig;
-import br.com.joaojunio.cloudkeeper.data.dto.file.MoveFileResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.folder.MoveFolderRequestDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.folder.MoveFolderResponseDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.folderStructure.FolderStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.FolderAddedToTheStructureDTO;
 import br.com.joaojunio.cloudkeeper.data.dto.json.ObjectToGenerateJsonDTO;
-import br.com.joaojunio.cloudkeeper.data.dto.user.UserDTO;
+import br.com.joaojunio.cloudkeeper.data.dto.person.PersonDTO;
 import br.com.joaojunio.cloudkeeper.model.FolderStructure;
-import br.com.joaojunio.cloudkeeper.model.User;
+import br.com.joaojunio.cloudkeeper.model.Person;
 import br.com.joaojunio.cloudkeeper.repositories.FolderStructureRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,7 @@ public class FolderStructureService {
         return parseListObjects(repository.findAll(), FolderStructureDTO.class);
     }
 
-    public void createUserFolderStructure(UserDTO user) {
+    public void createUserFolderStructure(PersonDTO user) {
         try {
             logger.info("Saving the user's Folder Structure in the Database");
 
@@ -54,7 +53,7 @@ public class FolderStructureService {
 
             FolderStructure folderStructure = new FolderStructure();
             folderStructure.setFolderStructurePath(objectGenerated.getSavedPath());
-            folderStructure.setUser(parseObject(user, User.class));
+            folderStructure.setUser(parseObject(user, Person.class));
 
             repository.save(folderStructure);
         }
