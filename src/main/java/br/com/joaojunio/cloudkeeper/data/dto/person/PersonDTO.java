@@ -8,7 +8,6 @@ public class PersonDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private Boolean enabled;
 
     public PersonDTO() {}
 
@@ -44,23 +43,15 @@ public class PersonDTO {
         this.email = email;
     }
 
-    public Boolean getEnabled() {
-        return this.enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         PersonDTO personDTO = (PersonDTO) o;
-        return Objects.equals(getId(), personDTO.getId()) && Objects.equals(getFirstName(), personDTO.getFirstName()) && Objects.equals(getLastName(), personDTO.getLastName()) && Objects.equals(getEmail(), personDTO.getEmail()) && Objects.equals(getEnabled(), personDTO.getEnabled());
+        return Objects.equals(getId(), personDTO.getId()) && Objects.equals(getFirstName(), personDTO.getFirstName()) && Objects.equals(getLastName(), personDTO.getLastName()) && Objects.equals(getEmail(), personDTO.getEmail());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getFirstName(), getLastName(), getEmail(), getEnabled());
+        return Objects.hash(getId(), getFirstName(), getLastName(), getEmail());
     }
 }

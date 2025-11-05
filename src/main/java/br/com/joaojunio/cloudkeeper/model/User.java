@@ -1,7 +1,6 @@
 package br.com.joaojunio.cloudkeeper.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.Objects;
 
@@ -9,12 +8,29 @@ import java.util.Objects;
 @Table(name = "user")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "user_name", unique = true)
     private String username;
+
+    @Column(name = "full_name")
     private String fullname;
+
+    @Column
     private String password;
+
+    @Column(name = "account_non_expired")
     private Boolean accountNonExpired;
+
+    @Column(name = "account_non_locked")
     private Boolean accountNonLocked;
+
+    @Column(name = "credentials_non_expired")
     private Boolean credentialsNonExpired;
+
+    @Column
     private Boolean enabled;
 
     public User() {}

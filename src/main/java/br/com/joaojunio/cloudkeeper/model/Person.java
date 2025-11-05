@@ -23,13 +23,10 @@ public class Person {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "enabled", nullable = false)
-    private Boolean enabled;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private FolderStructure folderStructure;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private Set<File> files = new HashSet<>();
 
     public Person() {}
@@ -66,14 +63,6 @@ public class Person {
         this.email = email;
     }
 
-    public Boolean getEnabled() {
-        return this.enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
     public Set<File> getFiles() {
         return files;
     }
@@ -86,11 +75,11 @@ public class Person {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return Objects.equals(getId(), person.getId()) && Objects.equals(getFirstName(), person.getFirstName()) && Objects.equals(getLastName(), person.getLastName()) && Objects.equals(getEmail(), person.getEmail()) && Objects.equals(getEnabled(), person.getEnabled()) && Objects.equals(folderStructure, person.folderStructure) && Objects.equals(getFiles(), person.getFiles());
+        return Objects.equals(getId(), person.getId()) && Objects.equals(getFirstName(), person.getFirstName()) && Objects.equals(getLastName(), person.getLastName()) && Objects.equals(getEmail(), person.getEmail()) && Objects.equals(folderStructure, person.folderStructure) && Objects.equals(getFiles(), person.getFiles());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getFirstName(), getLastName(), getEmail(), getEnabled(), folderStructure, getFiles());
+        return Objects.hash(getId(), getFirstName(), getLastName(), getEmail(), folderStructure, getFiles());
     }
 }

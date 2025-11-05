@@ -27,7 +27,7 @@ public class PersonService {
 
     public List<PersonDTO> findAll() {
 
-        logger.info("Finding all User");
+        logger.info("Finding all Person");
 
         return parseListObjects(repository.findAll(), PersonDTO.class);
     }
@@ -59,7 +59,7 @@ public class PersonService {
         var entity = parseObject(user, Person.class);
         var entitySaved = repository.save(entity);
 
-        folderStructureService.createUserFolderStructure(parseObject(entitySaved, PersonDTO.class));
+        folderStructureService.createPersonFolderStructure(parseObject(entitySaved, PersonDTO.class));
 
         return parseObject(entitySaved, PersonDTO.class);
     }
@@ -73,7 +73,6 @@ public class PersonService {
         entity.setFirstName(user.getFirstName());
         entity.setLastName(user.getLastName());
         entity.setEmail(user.getEmail());
-        entity.setEnabled(user.getEnabled());
 
         var dto = parseObject(repository.save(entity), PersonDTO.class);
         return dto;

@@ -43,17 +43,17 @@ public class FolderStructureService {
         return parseListObjects(repository.findAll(), FolderStructureDTO.class);
     }
 
-    public void createUserFolderStructure(PersonDTO user) {
+    public void createPersonFolderStructure(PersonDTO person) {
         try {
-            logger.info("Saving the user's Folder Structure in the Database");
+            logger.info("Saving the person's Folder Structure in the Database");
 
             var objectGenerated = jsonStorageService.generateJsonOfFolderStructure(
-                new ObjectToGenerateJsonDTO(user.getId(), user.getFirstName(), path)
+                new ObjectToGenerateJsonDTO(person.getId(), person.getFirstName(), path)
             );
 
             FolderStructure folderStructure = new FolderStructure();
             folderStructure.setFolderStructurePath(objectGenerated.getSavedPath());
-            folderStructure.setUser(parseObject(user, Person.class));
+            folderStructure.setPerson(parseObject(person, Person.class));
 
             repository.save(folderStructure);
         }

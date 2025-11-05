@@ -14,8 +14,8 @@ public class FolderStructure {
     private String folderStructurePath;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
-    private Person user;
+    @JoinColumn(name = "person_id")
+    private Person person;
 
     public FolderStructure() {}
 
@@ -27,12 +27,12 @@ public class FolderStructure {
         this.folderStructurePath = folderStructurePath;
     }
 
-    public Person getUser() {
-        return user;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setUser(Person user) {
-        this.user = user;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public Long getId() {

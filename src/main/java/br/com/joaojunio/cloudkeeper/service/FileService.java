@@ -33,7 +33,7 @@ public class FileService {
         }
 
         var entity = parseObject(file, File.class);
-        entity.setUser(user);
+        entity.setPerson(user);
         repository.save(entity);
     }
 

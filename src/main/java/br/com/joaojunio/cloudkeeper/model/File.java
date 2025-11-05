@@ -22,8 +22,8 @@ public class File {
     private Long size;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Person user;
+    @JoinColumn(name = "person_id")
+    private Person person;
 
     public File() {}
 
@@ -59,23 +59,23 @@ public class File {
         this.size = size;
     }
 
-    public Person getUser() {
-        return user;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setUser(Person user) {
-        this.user = user;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         File file = (File) o;
-        return Objects.equals(getId(), file.getId()) && Objects.equals(getName(), file.getName()) && Objects.equals(getType(), file.getType()) && Objects.equals(getSize(), file.getSize()) && Objects.equals(getUser(), file.getUser());
+        return Objects.equals(getId(), file.getId()) && Objects.equals(getName(), file.getName()) && Objects.equals(getType(), file.getType()) && Objects.equals(getSize(), file.getSize()) && Objects.equals(getPerson(), file.getPerson());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getType(), getSize(), getUser());
+        return Objects.hash(getId(), getName(), getType(), getSize(), getPerson());
     }
 }
