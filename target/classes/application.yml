@@ -38,7 +38,11 @@ spring-doc:
   path-to-match: /api/**/v1/**
   swagger-ui:
     use-root-path: true
-
+logging:
+  level:
+    #root: WARN
+    br.com.erudio: TRACE
+    net.sf.jasperreports.engine.*: TRACE
 # Chave de acesso ao Blackblaze - cloudkeeper
 # id da key = 005df139ad1f5050000000001
 # key = K005ET3/1hVihGGEI4Kk5JIROkJtnX8

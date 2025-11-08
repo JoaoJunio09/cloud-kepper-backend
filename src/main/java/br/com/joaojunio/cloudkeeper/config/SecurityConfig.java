@@ -41,7 +41,7 @@ public class SecurityConfig {
         );
 
         Map<String, PasswordEncoder> encoders = new HashMap<>();
-        encoders.put("encoder", pbkdf2Encoder);
+        encoders.put("pbkdf2", pbkdf2Encoder);
         DelegatingPasswordEncoder passwordEncoder = new DelegatingPasswordEncoder("pbkdf2", encoders);
 
         passwordEncoder.setDefaultPasswordEncoderForMatches(pbkdf2Encoder);
@@ -73,7 +73,7 @@ public class SecurityConfig {
                     "swagger-ui/**",
                     "/v3/api-docs/**"
                 ).permitAll()
-                .requestMatchers("/api/v1/**").authenticated()
+                .requestMatchers("/api/**").authenticated()
                 .requestMatchers("/users").denyAll()
             )
             .cors(cors -> {})
